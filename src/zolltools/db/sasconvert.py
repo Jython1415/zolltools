@@ -1,8 +1,11 @@
 """Module for converting a SAS database in the sas7bdat file format"""
 
+from __future__ import annotations
+
 from pathlib import Path
 import os
 import math
+import threading
 import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
@@ -98,6 +101,27 @@ class Converter:
 
         return True
 
+    class ConvertThread(threading.Thread):
+        """Helper class to create a thread for convert_sas_database"""
+
+        def __init__(
+            self,
+            thread_id: int,
+            name: str,
+            converter: Converter,
+            sas_path: Path,
+            result_set: set,
+        ):
+            threading.Thread.__init__(self)
+            self.thread_id = thread_id
+            self.name = name
+            self.converter = converter
+            self.sas_path = sas_path
+            self.result_set = result_set
+
+        def run(self):
+            self.result_set.add(self.converter.convert_sas(self.sas_path))
+
     def convert_sas_database(self) -> bool:
         """Converts all SAS files in the input directory and deletes the original files.
         Returns True if the conversion succeeds.
@@ -105,9 +129,17 @@ class Converter:
         """
 
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
-        conversion_results = set()
-        for sas_path in sas_paths:
-            conversion_results.add(self.convert_sas(sas_path))
+        conversion_results: set = set()
+        threads = [
+            Converter.ConvertThread(
+                index, sas_path.name, self, sas_path, conversion_results
+            )
+            for index, sas_path in enumerate(sas_paths)
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
         return False not in conversion_results
 
 
