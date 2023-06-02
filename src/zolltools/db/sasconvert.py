@@ -12,8 +12,9 @@ from .. import strtools
 class Converter:
     """Class to convert a database directory containing SAS files to another format"""
 
-    def __init__(self, db_path: Path = Path.cwd()):
+    def __init__(self, db_path: Path = Path.cwd(), target_in_memory_size=1e8):
         self.db_path = db_path
+        self.target_in_memory_size = target_in_memory_size
 
     @staticmethod
     def _get_sas_path(parquet_path: Path) -> Path:
@@ -30,8 +31,7 @@ class Converter:
         )
         return parquet_path
 
-    @staticmethod
-    def _get_chunk_size(sas_path: Path, target_in_memory_size=1e8) -> int:
+    def _get_chunk_size(self, sas_path: Path) -> int:
         """Returns the optimal chunk size for reading a SAS file.
         Estimates the number of rows that will keep the in-memory size of the chunk close to target_in_memory_size.
         """
@@ -41,15 +41,12 @@ class Converter:
             )
         )
         size = row.memory_usage(index=True, deep=True).sum()
-        return math.floor(target_in_memory_size / size)
+        return math.floor(self.target_in_memory_size / size)
 
-    @staticmethod
-    def _convert_sas(sas_path: Path, target_in_memory_size=1e8) -> Path:
+    def _convert_sas(self, sas_path: Path) -> Path:
         """Converts a SAS file and returns the path to the generated parquet file"""
 
-        chunk_size = Converter._get_chunk_size(
-            sas_path, target_in_memory_size=target_in_memory_size
-        )
+        chunk_size = self._get_chunk_size(sas_path)
 
         chunk_iterator = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
@@ -67,13 +64,12 @@ class Converter:
 
         return parquet_path
 
-    @staticmethod
-    def _validate_parquet_file(parquet_path: Path) -> bool:
+    def _validate_parquet_file(self, parquet_path: Path) -> bool:
         """Returns whether the parquet file matches the corresponding SAS file"""
 
         sas_path = Converter._get_sas_path(parquet_path)
         parquet_file = pq.ParquetFile(parquet_path)
-        chunk_size = math.floor(Converter._get_chunk_size(sas_path) / 2)
+        chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
         sas_iter = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
@@ -86,17 +82,14 @@ class Converter:
 
         return False not in results
 
-    @staticmethod
-    def convert_file(sas_path: Path, target_in_memory_size=1e8) -> bool:
+    def convert_file(self, sas_path: Path) -> bool:
         """Converts the input SAS file and deletes it if the conversion is successful.
         Returns True upon success.
         Returns False if validation fails.
         """
 
-        parquet_path = Converter._convert_sas(
-            sas_path, target_in_memory_size=target_in_memory_size
-        )
-        if not Converter._validate_parquet_file(parquet_path):
+        parquet_path = self._convert_sas(sas_path)
+        if not self._validate_parquet_file(parquet_path):
             return False
 
         sas_path = Converter._get_sas_path(parquet_path)
@@ -115,7 +108,7 @@ class Converter:
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
         conversion_results = set()
         for sas_path in sas_paths:
-            conversion_results.add(Converter.convert_file(sas_path))
+            conversion_results.add(self.convert_file(sas_path))
         return False not in conversion_results
 
 
