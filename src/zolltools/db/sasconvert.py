@@ -120,6 +120,7 @@ class Converter:
             self.result_set = result_set
 
         def run(self):
+            print(f"thread {self.name} started")
             self.result_set.add(self.converter.convert_sas(self.sas_path))
 
     def convert_sas_database(self) -> bool:
