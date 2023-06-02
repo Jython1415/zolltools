@@ -3,7 +3,6 @@
 from pathlib import Path
 import os
 import math
-import pandas as pd
 import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
