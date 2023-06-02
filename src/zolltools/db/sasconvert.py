@@ -35,7 +35,7 @@ class Converter:
         """Returns the optimal chunk size for reading a SAS file.
         Estimates the number of rows that will keep the in-memory size of the chunk close to target_in_memory_size.
         """
-        row: pd.DataFrame = next(
+        row, _ = next(
             pyreadstat.read_file_in_chunks(
                 pyreadstat.read_sas7bdat, sas_path, chunksize=1
             )
