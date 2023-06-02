@@ -54,7 +54,7 @@ class ParquetManager:
         """
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
-        pq_file, _ = self._get_parquet_file(pq_name)add
+        pq_file, _ = self._get_parquet_file(pq_name)
         pq_iter = pq_file.iter_batches(batch_size=1)
         row = next(pq_iter).to_pandas()
         size = row.memory_usage(index=True, deep=True).sum()
