@@ -41,16 +41,23 @@ class Reader:
     @staticmethod
     def _pq_generator(pq_iter):
         """Generator that wrap an iterator for reading a parquet file in chunks.
-        The generator returns pandas.DataFrame objects instead of parquet batches."""
+        The generator returns pandas.DataFrame objects instead of parquet batches.
+        """
         for batch in pq_iter:
             yield batch.to_pandas()
 
-    def get_reader(self, pq_name: str, target_in_memory_size=None) -> GeneratorType:
-        """Returns an iterator that yields data frames of chunks of the input file."""
+    def get_reader(self, pq_name: str, columns=None, target_in_memory_size=None) -> GeneratorType:
+        """
+        Returns an iterator that yields data frames of chunks of the input file.
+        
+        :param pq_name: name (w/o file extension) of the file to read
+        :param columns: columns of the table to read. If set to None, all columns will be read
+        :param target_in_memory_size: target size for each chunk (data frame) in memory
+        """
         if target_in_memory_size is None:
             target_in_memory_size = self.default_target_in_memory_size
         chunk_size = self._calc_chunk_size(pq_name)
         pq_file = self._get_parquet_file(pq_name)
-        pq_iter = pq_file.iter_batches(batch_size=chunk_size)
+        pq_iter = pq_file.iter_batches(batch_size = chunk_size, columns = columns)
 
         return Reader._pq_generator(pq_iter)
