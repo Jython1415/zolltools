@@ -87,13 +87,15 @@ class Converter:
         return False not in results
 
     @staticmethod
-    def convert_file(sas_path: Path) -> bool:
+    def convert_file(sas_path: Path, target_in_memory_size=1e8) -> bool:
         """Converts the input SAS file and deletes it if the conversion is successful.
         Returns True upon success.
         Returns False if validation fails.
         """
 
-        parquet_path = Converter._convert_sas(sas_path)
+        parquet_path = Converter._convert_sas(
+            sas_path, target_in_memory_size=target_in_memory_size
+        )
         if not Converter._validate_parquet_file(parquet_path):
             return False
 
