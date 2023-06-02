@@ -81,7 +81,7 @@ class Converter:
 
         return False not in results
 
-    def convert_file(self, sas_path: Path) -> bool:
+    def convert_sas(self, sas_path: Path) -> bool:
         """Converts the input SAS file and deletes it if the conversion is successful.
         Returns True upon success.
         Returns False if validation fails.
@@ -107,7 +107,7 @@ class Converter:
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
         conversion_results = set()
         for sas_path in sas_paths:
-            conversion_results.add(self.convert_file(sas_path))
+            conversion_results.add(self.convert_sas(sas_path))
         return False not in conversion_results
 
 
