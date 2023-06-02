@@ -23,12 +23,12 @@ class Converter:
         )
 
     @staticmethod
-    def _get_parquet_path(sas_path: Path) -> tuple:
+    def _get_parquet_path(sas_path: Path) -> Path:
         """Returns a Path to the parquet file corresponding to the input SAS file"""
         parquet_path = sas_path.parent.joinpath(
             f"{strtools.removesuffix(sas_path.name, '.sas7bdat')}.parquet"
         )
-        return (parquet_path, pq.ParquetFile(parquet_path))
+        return parquet_path
 
     @staticmethod
     def _get_chunk_size(sas_path: Path, target_in_memory_size=1e8) -> int:
@@ -54,7 +54,7 @@ class Converter:
         chunk_iterator = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
-        parquet_path, _ = Converter._get_parquet_path(sas_path)
+        parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
             raise FileExistsError(f"{parquet_path} already exists")
         for index, (chunk, _) in enumerate(chunk_iterator):
