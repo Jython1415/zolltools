@@ -11,11 +11,13 @@ def test_removeprefix_empty_string(prefix: str):
 
     assert strtools.removeprefix("", prefix) == ""
 
+
 @hp.given(string=st.text())
 def test_removeprefix_empty_prefix(string: str):
     """removeprefix test for empty prefix"""
-    
+
     assert strtools.removeprefix(string, "") == string
+
 
 @hp.given(suffix=st.text())
 def test_removesuffix_empty_string(suffix: str):
@@ -27,7 +29,7 @@ def test_removesuffix_empty_string(suffix: str):
 @hp.given(string=st.text())
 def test_removesuffix_empty_suffix(string: str):
     """removesuffix test for empty suffix"""
-    
+
     assert strtools.removesuffix(string, "") == string
 
 
