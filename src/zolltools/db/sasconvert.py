@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 import os
 import math
@@ -10,6 +11,7 @@ import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
 
+logger = logging.getLogger(__name__)
 
 class Converter:
     """Class to convert a database directory containing SAS files to another format"""
