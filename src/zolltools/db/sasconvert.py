@@ -62,8 +62,8 @@ class Converter:
         parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
             raise FileExistsError(f"{parquet_path} already exists")
+        start_time = time.perf_counter()
         for index, (chunk, _) in enumerate(chunk_iterator):
-            start_time = time.perf_counter()
             if index == 0:
                 chunk.to_parquet(parquet_path, engine="fastparquet", index=False)
             else:
@@ -72,6 +72,7 @@ class Converter:
                 )
             end_time = time.perf_counter()
             logger.debug("_convert_sas iteration: %d, %f", index, end_time - start_time)
+            start_time = time.perf_counter()
 
         return parquet_path
 
@@ -87,16 +88,17 @@ class Converter:
         parquet_iter = parquet_file.iter_batches(batch_size=chunk_size)
 
         results = set()
+        start_time = time.perf_counter()
         for index, ((sas_frame, _), parquet_batch) in enumerate(
             zip(sas_iter, parquet_iter)
         ):
-            start_time = time.perf_counter()
             parquet_frame = parquet_batch.to_pandas()
             results.add(sas_frame.equals(parquet_frame))
             end_time = time.perf_counter()
             logger.debug(
                 "_validate_parquet_file iteration: %d, %f", index, end_time - start_time
             )
+            start_time = time.perf_counter()
 
         return False not in results
 
