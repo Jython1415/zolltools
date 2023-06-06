@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+import logging
 from pathlib import Path
 import os
 import math
@@ -9,6 +11,9 @@ import threading
 import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class Converter:
@@ -35,7 +40,8 @@ class Converter:
 
     def _get_chunk_size(self, sas_path: Path) -> int:
         """Returns the optimal chunk size for reading a SAS file.
-        Estimates the number of rows that will keep the in-memory size of the chunk close to target_in_memory_size.
+        Estimates the number of rows that will keep the in-memory
+        size of the chunk close to target_in_memory_size.
         """
         row, _ = next(
             pyreadstat.read_file_in_chunks(
@@ -57,12 +63,15 @@ class Converter:
         if parquet_path.exists():
             raise FileExistsError(f"{parquet_path} already exists")
         for index, (chunk, _) in enumerate(chunk_iterator):
+            start_time = time.perf_counter()
             if index == 0:
                 chunk.to_parquet(parquet_path, engine="fastparquet", index=False)
             else:
                 chunk.to_parquet(
                     parquet_path, engine="fastparquet", index=False, append=True
                 )
+            end_time = time.perf_counter()
+            logger.debug("_convert_sas iteration: %d, %f", index, end_time - start_time)
 
         return parquet_path
 
@@ -78,9 +87,16 @@ class Converter:
         parquet_iter = parquet_file.iter_batches(batch_size=chunk_size)
 
         results = set()
-        for (sas_frame, _), parquet_batch in zip(sas_iter, parquet_iter):
+        for index, ((sas_frame, _), parquet_batch) in enumerate(
+            zip(sas_iter, parquet_iter)
+        ):
+            start_time = time.perf_counter()
             parquet_frame = parquet_batch.to_pandas()
             results.add(sas_frame.equals(parquet_frame))
+            end_time = time.perf_counter()
+            logger.debug(
+                "_validate_parquet_file iteration: %d, %f", index, end_time - start_time
+            )
 
         return False not in results
 
