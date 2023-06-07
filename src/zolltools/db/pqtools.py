@@ -100,7 +100,7 @@ class Reader(ParquetManager):
             yield batch.to_pandas()
 
     def get_reader(
-        self, pq_name: str, columns=None, target_in_memory_size=None, tmp=False
+        self, pq_name: str, columns=None, target_in_memory_size=None, tmp=True
     ) -> GeneratorType:
         """
         Returns an iterator that yields data frames of chunks of the input file.
