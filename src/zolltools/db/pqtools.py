@@ -60,7 +60,26 @@ class ParquetManager:
         size = row.memory_usage(index=True, deep=True).sum()
         return math.floor(target_in_memory_size / size)
 
-    def get_table_list(self, tmp=False) -> list:
+    def get_tables(self, tmp=True) -> list:
+        """
+        Returns a list of the names of parquet tables in the database.
+        The default search location is the temporary tables, but that can
+        be changed with the `tmp` parameter
+
+        :param tmp: True to search temporary tables, False to search the
+        primary database
+        :returns: a list of names (str)
+        """
+
+        dir_path = self.config.tmp_path if tmp else self.config.db_path
+        return sorted(
+            [
+                removesuffix(path.name, ".parquet")
+                for path in list(dir_path.glob("*.parquet"))
+            ]
+        )
+
+    def get_table_paths(self, tmp=False) -> list:
         """Returns a list of parquet files as Path objects. The tmp parameter determines
         what directory will be searched.
         """
