@@ -112,7 +112,7 @@ class Reader(ParquetManager):
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
-        chunk_size = self._calc_chunk_size(pq_name)
+        chunk_size = self._calc_chunk_size(pq_name, tmp=tmp)
         pq_file, _ = self._get_parquet_file(pq_name, tmp)
         pq_iter = pq_file.iter_batches(batch_size=chunk_size, columns=columns)
 
