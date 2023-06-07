@@ -94,7 +94,7 @@ class Reader(ParquetManager):
     """Class to read and interface with a database of parquet files"""
 
     @staticmethod
-    def _pq_generator(pq_iter):
+    def _pq_generator(pq_iter) -> pd.DataFrame:
         """Generator that wrap an iterator for reading a parquet file in chunks.
         The generator returns pandas.DataFrame objects instead of parquet batches.
         """
