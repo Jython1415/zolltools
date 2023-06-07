@@ -1,11 +1,19 @@
 """Module for converting a SAS database in the sas7bdat file format"""
 
+from __future__ import annotations
+
+import time
+import logging
 from pathlib import Path
 import os
 import math
+import threading
 import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class Converter:
@@ -32,7 +40,8 @@ class Converter:
 
     def _get_chunk_size(self, sas_path: Path) -> int:
         """Returns the optimal chunk size for reading a SAS file.
-        Estimates the number of rows that will keep the in-memory size of the chunk close to target_in_memory_size.
+        Estimates the number of rows that will keep the in-memory
+        size of the chunk close to target_in_memory_size.
         """
         row, _ = next(
             pyreadstat.read_file_in_chunks(
@@ -53,6 +62,7 @@ class Converter:
         parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
             raise FileExistsError(f"{parquet_path} already exists")
+        start_time = time.perf_counter()
         for index, (chunk, _) in enumerate(chunk_iterator):
             if index == 0:
                 chunk.to_parquet(parquet_path, engine="fastparquet", index=False)
@@ -60,6 +70,9 @@ class Converter:
                 chunk.to_parquet(
                     parquet_path, engine="fastparquet", index=False, append=True
                 )
+            end_time = time.perf_counter()
+            logger.debug("_convert_sas iteration: %d, %f", index, end_time - start_time)
+            start_time = time.perf_counter()
 
         return parquet_path
 
@@ -75,9 +88,17 @@ class Converter:
         parquet_iter = parquet_file.iter_batches(batch_size=chunk_size)
 
         results = set()
-        for (sas_frame, _), parquet_batch in zip(sas_iter, parquet_iter):
+        start_time = time.perf_counter()
+        for index, ((sas_frame, _), parquet_batch) in enumerate(
+            zip(sas_iter, parquet_iter)
+        ):
             parquet_frame = parquet_batch.to_pandas()
             results.add(sas_frame.equals(parquet_frame))
+            end_time = time.perf_counter()
+            logger.debug(
+                "_validate_parquet_file iteration: %d, %f", index, end_time - start_time
+            )
+            start_time = time.perf_counter()
 
         return False not in results
 
@@ -98,6 +119,28 @@ class Converter:
 
         return True
 
+    class ConvertThread(threading.Thread):
+        """Helper class to create a thread for convert_sas_database"""
+
+        def __init__(
+            self,
+            thread_id: int,
+            name: str,
+            converter: Converter,
+            sas_path: Path,
+            result_set: set,
+        ):
+            threading.Thread.__init__(self)
+            self.thread_id = thread_id
+            self.name = name
+            self.converter = converter
+            self.sas_path = sas_path
+            self.result_set = result_set
+
+        def run(self):
+            print(f"thread {self.name} started")
+            self.result_set.add(self.converter.convert_sas(self.sas_path))
+
     def convert_sas_database(self) -> bool:
         """Converts all SAS files in the input directory and deletes the original files.
         Returns True if the conversion succeeds.
@@ -105,9 +148,17 @@ class Converter:
         """
 
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
-        conversion_results = set()
-        for sas_path in sas_paths:
-            conversion_results.add(self.convert_sas(sas_path))
+        conversion_results: set = set()
+        threads = [
+            Converter.ConvertThread(
+                index, sas_path.name, self, sas_path, conversion_results
+            )
+            for index, sas_path in enumerate(sas_paths)
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
         return False not in conversion_results
 
 

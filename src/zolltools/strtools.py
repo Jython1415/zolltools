@@ -2,13 +2,13 @@
 
 def removeprefix(string, prefix) -> str:
     """Removes prefix from string"""
-    if string.startswith(prefix):
+    if len(prefix) != 0 and string.startswith(prefix):
         return string[len(prefix):]
     return string
 
 def removesuffix(string, suffix) -> str:
     """Removes suffix from string"""
-    if string.endswith(suffix):
+    if len(suffix) != 0 and string.endswith(suffix):
         return string[:-len(suffix)]
     return string
 
