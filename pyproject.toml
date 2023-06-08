@@ -24,6 +24,11 @@ dependencies = [
 
 ]
 
+[tool.hatch.build]
+exclude = [
+  "github/ISSUE_TEMPLATE/*.md"
+]
+
 [project.urls]
 "Homepage" = "https://github.com/Jython1415/zolltools"
 "Bug Tracker" = "https://github.com/Jython1415/zolltools/issues"
