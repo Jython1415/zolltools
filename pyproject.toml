@@ -4,19 +4,49 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev4"
+version = "0.0.3.dev26"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
-description = "A package for working with large SAS files"
+description = "A package for the Zoll Foundation Grant Project--a lab at CWRU"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Scientific/Engineering"
+]
+dependencies = [
+
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/Jython1415/zolltools"
 "Bug Tracker" = "https://github.com/Jython1415/zolltools/issues"
+
+[tool.hatch.build]
+ignore-vcs = true
+include = [
+  "/requirements.txt",
+  "/LICENSE",
+  "/README.md",
+  "/pyproject.toml",
+  "/src/**/*.py",
+  "/src/**/data/*.pkl",
+  "/tests/**/*.py",
+  "/tests/**/*.ipynb",
+  "/tests/integration/**/*.parquet"
+]
+exclude = [
+  "**/tmp/**"
+]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src/zolltools"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
