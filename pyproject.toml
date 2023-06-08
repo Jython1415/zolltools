@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev19"
+version = "0.0.3.dev20"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -34,7 +34,14 @@ include = [
   "/requirements.txt",
   "/LICENSE",
   "/README.md",
-  "/pyproject.toml"
+  "/pyproject.toml",
+  "/src/**",
+  "/tests/**/*.py",
+  "/tests/**/*.ipynb",
+  "/tests/integration/**/*parquet"
+]
+exclude = [
+  "**/tmp/**"
 ]
 
 [tool.hatch.build.targets.wheel]
