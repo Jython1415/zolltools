@@ -1,4 +1,9 @@
-.*
-!.gitignore
 dist/*
 */__pycache__/*
+.github/*
+.hypothesis/*
+.mypy_cache/*
+.pytest_cache/*
+.venv/*
+.vscode/*
+.new_build.sh
