@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev21"
+version = "0.0.3.dev22"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -35,7 +35,7 @@ include = [
   "/LICENSE",
   "/README.md",
   "/pyproject.toml",
-  "/src/**/.py",
+  "/src/**/*.py",
   "/src/**/data/*.pkl",
   "/tests/**/*.py",
   "/tests/**/*.ipynb",
