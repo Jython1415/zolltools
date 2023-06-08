@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev13"
+version = "0.0.3.dev14"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -29,8 +29,14 @@ dependencies = [
 "Bug Tracker" = "https://github.com/Jython1415/zolltools/issues"
 
 [tool.hatch.build]
-exclude = [
-  "*/.gitignore"
+ignore-vcs = true
+include = [
+  "*.py",
+  ".ipynb",
+  "LICENSE",
+  "README.md",
+  "pyproject.toml",
+  "requirements.txt"
 ]
 
 [tool.hatch.build.targets.wheel]
