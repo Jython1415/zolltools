@@ -36,3 +36,11 @@ def to_description(code, default=None):
         return "not-found"
 
     return description
+
+
+def main():
+    """Method that defines the logic of the module when executed."""
+
+
+if __name__ == "__main__":
+    main
