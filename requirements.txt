@@ -29,8 +29,6 @@ fqdn==1.5.1
 fsspec==2023.5.0
 hypothesis==6.76.0
 idna==3.4
-importlib==1.0.4
-importlib-metadata==6.6.0
 iniconfig==2.0.0
 ipykernel==6.23.1
 ipython==8.14.0
