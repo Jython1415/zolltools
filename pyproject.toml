@@ -26,7 +26,7 @@ dependencies = [
 
 [tool.hatch.build]
 exclude = [
-  "github/ISSUE_TEMPLATE/*.md"
+  "github/ISSUE_TEMPLATE/*"
 ]
 
 [project.urls]
