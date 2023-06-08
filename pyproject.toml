@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev22"
+version = "0.0.3.dev23"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -39,7 +39,7 @@ include = [
   "/src/**/data/*.pkl",
   "/tests/**/*.py",
   "/tests/**/*.ipynb",
-  "/tests/integration/**/*parquet"
+  "/tests/integration/**/*.parquet"
 ]
 exclude = [
   "**/tmp/**"
