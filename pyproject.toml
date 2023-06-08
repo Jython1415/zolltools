@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.4.dev2"
+version = "0.0.4.dev3"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
