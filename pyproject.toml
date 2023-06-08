@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev14"
+version = "0.0.3.dev15"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -31,8 +31,13 @@ dependencies = [
 [tool.hatch.build]
 ignore-vcs = true
 include = [
-  "*.py",
-  ".ipynb",
+  "src/zolltools/*.py",
+  "src/db/*.py",
+  "src/nemsis/*.py",
+  "tests/integration/*.py",
+  "tests/integration/*.ipynb",
+  "tests/integration/test_pqtools/*.parquet",
+  "tests/unit/*.py",
   "LICENSE",
   "README.md",
   "pyproject.toml",
