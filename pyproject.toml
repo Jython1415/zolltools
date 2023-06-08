@@ -28,21 +28,6 @@ dependencies = [
 "Homepage" = "https://github.com/Jython1415/zolltools"
 "Bug Tracker" = "https://github.com/Jython1415/zolltools/issues"
 
-[tool.hatch.build]
-ignore-vcs = true
-include = [
-  "/src/zolltools/*.py",
-  "/src/db/*.py",
-  "/src/nemsis/*.py",
-  "/tests/integration/*.py",
-  "/tests/integration/*.ipynb",
-  "/tests/integration/test_pqtools/*.parquet",
-  "/tests/unit/*.py",
-  "/LICENSE",
-  "/README.md",
-  "/pyproject.toml",
-  "/requirements.txt"
-]
 
 [tool.hatch.build.targets.wheel]
 only-include = ["src/zolltools"]
