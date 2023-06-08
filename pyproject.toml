@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.4.dev1"
+version = "0.0.4.dev2"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -21,7 +21,9 @@ classifiers = [
     "Topic :: Scientific/Engineering"
 ]
 dependencies = [
-
+  "pandas>=0.4",
+  "pyarrow>=2",
+  "pyreadstat>=1.1.7",
 ]
 
 [project.urls]
