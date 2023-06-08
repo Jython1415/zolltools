@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.3.dev17"
+version = "0.0.3.dev18"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -22,11 +22,6 @@ classifiers = [
 ]
 dependencies = [
 
-]
-
-[tool.hatch.build]
-exclude = [
-  "github/ISSUE_TEMPLATE/*"
 ]
 
 [project.urls]
