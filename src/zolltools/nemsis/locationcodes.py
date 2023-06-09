@@ -9,8 +9,8 @@ from importlib import resources
 import zolltools
 from zolltools import strtools
 
-_STORAGE_FOLDER_NAME = "location-codes-groupings"
-_STORAGE_FOLDER_EXT = ".json"
+STORAGE_FOLDER_NAME = "location-codes-groupings"
+STORAGE_FOLDER_EXT = ".json"
 
 
 def get_mapping() -> dict:
@@ -49,7 +49,7 @@ def to_description(code, default=None):
 def _get_storage_dir() -> Path:
     """Return a Path pointing to the directory holding the groupings"""
 
-    return Path.cwd().joinpath(_STORAGE_FOLDER_NAME)
+    return Path.cwd().joinpath(STORAGE_FOLDER_NAME)
 
 
 def get_grouping(name: str) -> dict:
@@ -62,7 +62,7 @@ def get_grouping(name: str) -> dict:
     """
 
     storage_dir = _get_storage_dir()
-    grouping_path = storage_dir.joinpath(f"{name}{_STORAGE_FOLDER_EXT}")
+    grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXT}")
 
     if not grouping_path.exists():
         raise FileNotFoundError(
@@ -80,9 +80,9 @@ def _list():
     """Lists location code groupings"""
 
     storage_dir = _get_storage_dir()
-    paths = storage_dir.glob(f"*{_STORAGE_FOLDER_EXT}")
+    paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXT}")
     names = sorted(
-        [strtools.removesuffix(path.name, _STORAGE_FOLDER_EXT) for path in paths]
+        [strtools.removesuffix(path.name, STORAGE_FOLDER_EXT) for path in paths]
     )
 
     print("\n".join(names))
@@ -95,10 +95,10 @@ def _validate():
 def _init():
     """Initializes a folder for location code groupings"""
 
-    storage_dir = Path.cwd().joinpath(_STORAGE_FOLDER_NAME)
+    storage_dir = _get_storage_dir()
     storage_dir.mkdir(exist_ok=True)
 
-    print(f"Store location code groupings in {_STORAGE_FOLDER_NAME}\n> {storage_dir}")
+    print(f"Store location code groupings in {STORAGE_FOLDER_NAME}\n> {storage_dir}")
 
 
 def main():
