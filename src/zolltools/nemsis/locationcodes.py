@@ -45,6 +45,18 @@ def to_description(code, default=None):
     return description
 
 
+def get_grouping(name: str) -> dict:
+    """
+    Returns a grouping of Y92 codes.
+
+    :param name: the name of the grouping to retrieve.
+    :returns: a dict representing the grouping
+    :raises FileNotFoundError: when there is no grouping corresponding to `name`
+    """
+
+    return {"hi": name}
+
+
 def _list():
     """Lists location code groupings"""
 
