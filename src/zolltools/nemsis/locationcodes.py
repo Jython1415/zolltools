@@ -22,11 +22,21 @@ def get_mapping() -> dict:
         return pickle.load(file)
 
 
-def to_description(code, default=None):
-    """Returns the description for the provided code
-    Raises a KeyError exception if the code does not
-    match the data dictionary for Y92 code listing
+def to_description(code, default=None, mapping=None):
     """
+    Returns the description for the provided code
+    
+    :param code: the code to get a description of
+    :param default: the value to return if a description is not found. If set to `None`,
+    a KeyError exception will be raised instead.
+    :param mapping: the mapping to use. If set to `None`, the function will use the mapping
+    provided in the module: `locationcodes.get_mapping()`
+    :returns: a description of the Y92 code, `code`
+    :raises KeyError: if the code does not match the data dictionary for Y92 code listing
+    """
+
+    if mapping is None:
+        mapping = get_mapping()
 
     if code == "7701001":
         return "Not Applicable"
@@ -34,14 +44,14 @@ def to_description(code, default=None):
         return "Not Recorded"
 
     try:
-        description = get_mapping()[code]
+        description = mapping[code]
     except KeyError as error:
         if default is None:
             raise KeyError(
                 f"{code} is an invalid code."
                 "Not in the NEMSIS data dictionary or Y92 code listings."
             ) from error
-        return "not-found"
+        return default
 
     return description
 
