@@ -1,7 +1,6 @@
 """Tests for sasconvert.py"""
 
 from pathlib import Path
-import pytest
 import hypothesis as hp
 import hypothesis.strategies as st
 from zolltools.db.sasconvert import Converter
