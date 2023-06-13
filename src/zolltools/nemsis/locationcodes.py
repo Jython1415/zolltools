@@ -1,5 +1,6 @@
 """Module for working with Y92 codes"""
 
+import logging
 import json
 from pathlib import Path
 import argparse
@@ -8,6 +9,9 @@ import pickle
 from importlib import resources
 import zolltools
 from zolltools import strtools
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXT = ".json"
@@ -25,7 +29,7 @@ def get_mapping() -> dict:
 def to_description(code, default=None, mapping=None):
     """
     Returns the description for the provided code
-    
+
     :param code: the code to get a description of
     :param default: the value to return if a description is not found. If set to `None`,
     a KeyError exception will be raised instead.

@@ -1,5 +1,6 @@
 """Module for reading parquet files in a database."""
 
+import logging
 import math
 from pathlib import Path
 import os
@@ -7,6 +8,9 @@ from types import GeneratorType
 import pyarrow.parquet as pq
 import pandas as pd
 from ..strtools import removesuffix
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class ParquetManagerConfig:
