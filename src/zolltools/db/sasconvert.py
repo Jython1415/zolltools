@@ -22,6 +22,7 @@ class Converter:
     def __init__(self, db_path: Path = Path.cwd(), target_in_memory_size=1e8):
         self.db_path = db_path
         self.target_in_memory_size = target_in_memory_size
+        logger.debug("Converter initialized to %s", self.db_path)
 
     @staticmethod
     def _get_sas_path(parquet_path: Path) -> Path:
@@ -56,12 +57,14 @@ class Converter:
         """Converts a SAS file and returns the path to the generated parquet file"""
 
         chunk_size = self._get_chunk_size(sas_path)
+        logger.debug("_convert_sas chunk size for %s set to %d", sas_path, chunk_size)
 
         chunk_iterator = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
         parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
+            logger.error("_convert_sas aborted because %s already exists", parquet_path)
             raise FileExistsError(f"{parquet_path} already exists")
         start_time = time.perf_counter()
         for index, (chunk, _) in enumerate(chunk_iterator):
@@ -83,6 +86,7 @@ class Converter:
         sas_path = Converter._get_sas_path(parquet_path)
         parquet_file = pq.ParquetFile(parquet_path)
         chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
+        logger.debug("_validate_parquet_file chunk size for %s set to %d", sas_path, chunk_size)
         sas_iter = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
@@ -111,12 +115,14 @@ class Converter:
 
         parquet_path = self._convert_sas(sas_path)
         if not self._validate_parquet_file(parquet_path):
+            logger.error("convert_sas of %s failed due to failed validation", sas_path)
             return False
 
         sas_path = Converter._get_sas_path(parquet_path)
         with open(sas_path, "w", encoding="utf-8"):
             pass
         os.remove(sas_path)
+        logger.info("convert_sas: file %s deleted", sas_path)
 
         return True
 
