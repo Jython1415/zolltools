@@ -3,7 +3,7 @@
 ## Logging
 
 Logger names for each of the messages follow standard convention. Each module
-has it's own logger, and they can be accessed with `logging.get_logger()`. The
+has its own logger, and they can be accessed with `logging.get_logger()`. The
 name of each module's logger also follows standard convention. For example, the
 name of the logger for the `sasconvert` module would be
 `"zolltools.db.sasconvert"`. Included below is a short example of how one can
