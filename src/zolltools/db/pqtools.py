@@ -35,7 +35,6 @@ class ParquetManagerConfig:
         )
 
 
-# TODO rename?
 class ParquetManager:
     """Class that represents an object that interfaces with a parquet database"""
 
