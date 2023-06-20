@@ -6,7 +6,6 @@ import importlib
 
 import pytest
 from scipy import stats
-
 from zolltools.nemsis import locationcodes
 
 
