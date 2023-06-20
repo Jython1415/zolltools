@@ -14,19 +14,28 @@ logger.addHandler(logging.NullHandler())
 
 
 class ParquetManagerConfig:
-    """Class that represents the configuration of a parquet manager"""
+    """
+    Class that represents the configuration of a parquet manager
+    """
 
     def __init__(
         self, db_path: Path = Path.cwd(), default_target_in_memory_size: int = int(1e8)
     ):
-        """Initializes a new Reader object"""
+        """
+        Initializes a new Reader object
+        """
+
         self.db_path = db_path
         self.default_target_in_memory_size = default_target_in_memory_size
         self.tmp_path = db_path.joinpath("tmp")
         if not self.tmp_path.exists():
             os.mkdir(self.tmp_path)
+        logger.debug(
+            "ParquetManagerConfig.__init__: new configuration created %s", repr(self)
+        )
 
 
+# TODO rename?
 class ParquetManager:
     """Class that represents an object that interfaces with a parquet database"""
 
@@ -35,34 +44,48 @@ class ParquetManager:
 
     def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
         """
-        Returns the parquet file object and Path object given the name (w/o the file extension)
-        of a parquet file.
+        Returns the parquet file object and Path object given the name (w/o the
+        file extension) of a parquet file.
 
         :param pq_name: name (w/o file extension) of the file to read
-        :param tmp: bool of whether to read a temporary file or an original database file
+        :param tmp: bool of whether to read a temporary file or an original
+        database file
         :returns: (pq.ParquetFile, Path)
         """
+
         file_name = f"{pq_name}.parquet"
         dir_path = self.config.tmp_path if tmp else self.config.db_path
         file_path = dir_path.joinpath(file_name)
+        logger.debug(
+            "ParquetManager._get_parquet_file: returned path and "
+            "pyarrow.parquet.ParquetFile for %s",
+            file_path,
+        )
 
         return (pq.ParquetFile(file_path), file_path)
 
     def _calc_chunk_size(
         self, pq_name: str, tmp=True, target_in_memory_size=None
     ) -> int:
-        """Returns the optimal chunk size for reading a parquet file.
-        Estimates the number of rows that will keep the in-memory size of the chunk
-        close to the target_in_memory_size (or default_target_in_memory_size if the
-        value is not provided).
         """
+        Returns the optimal chunk size for reading a parquet file.
+        Estimates the number of rows that will keep the in-memory size of the
+        chunk close to the target_in_memory_size (or
+        `default_target_in_memory_size` if the value is not provided).
+        """
+
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         pq_file, _ = self._get_parquet_file(pq_name, tmp=tmp)
         pq_iter = pq_file.iter_batches(batch_size=1)
         row = next(pq_iter).to_pandas()
         size = row.memory_usage(index=True, deep=True).sum()
-        return math.floor(target_in_memory_size / size)
+        num_rows = math.floor(target_in_memory_size / size)
+        logger.debug(
+            "ParquetManager._calc_chunk_size: calculated chunk size to be %d rows",
+            num_rows,
+        )
+        return num_rows
 
     def get_tables(self, tmp=True) -> list:
         """
@@ -76,6 +99,7 @@ class ParquetManager:
         """
 
         dir_path = self.config.tmp_path if tmp else self.config.db_path
+        logger.debug("ParquetManager.get_tables: reading from %s", dir_path)
         return sorted(
             [
                 removesuffix(path.name, ".parquet")
@@ -84,11 +108,13 @@ class ParquetManager:
         )
 
     def get_table_paths(self, tmp=True) -> list:
-        """Returns a list of parquet files as Path objects. The tmp parameter determines
-        what directory will be searched.
+        """
+        Returns a list of parquet files as Path objects. The tmp parameter
+        determines what directory will be searched.
         """
 
         dir_path = self.config.tmp_path if tmp else self.config.db_path
+        logger.debug("ParquetManager.get_table_paths: reading from %s", dir_path)
         return list(dir_path.glob("*.parquet"))
 
 
@@ -97,9 +123,11 @@ class Reader(ParquetManager):
 
     @staticmethod
     def _pq_generator(pq_iter) -> pd.DataFrame:
-        """Generator that wrap an iterator for reading a parquet file in chunks.
+        """
+        Generator that wrap an iterator for reading a parquet file in chunks.
         The generator returns pandas.DataFrame objects instead of parquet batches.
         """
+
         for batch in pq_iter:
             yield batch.to_pandas()
 
@@ -110,15 +138,22 @@ class Reader(ParquetManager):
         Returns an iterator that yields data frames of chunks of the input file.
 
         :param pq_name: name (w/o file extension) of the file to read
-        :param columns: columns of the table to read. If set to None, all columns will be read
-        :param target_in_memory_size: target size for each chunk (data frame) in memory
+        :param columns: columns of the table to read. If set to None, all
+        columns will be read
+        :param target_in_memory_size: target size for each chunk (data frame) in
+        memory
         """
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         chunk_size = self._calc_chunk_size(pq_name, tmp=tmp)
-        pq_file, _ = self._get_parquet_file(pq_name, tmp)
+        pq_file, pq_path = self._get_parquet_file(pq_name, tmp)
         pq_iter = pq_file.iter_batches(batch_size=chunk_size, columns=columns)
+        logger.info(
+            "Reader.get_reader: Returning reader for %s with chunk size %d",
+            pq_path,
+            chunk_size,
+        )
 
         return Reader._pq_generator(pq_iter)
 
@@ -138,11 +173,13 @@ class Writer(ParquetManager):
 
         parquet_path = self.config.tmp_path.joinpath(f"{name}.parquet")
         frame.to_parquet(parquet_path, engine="fastparquet", index=False)
-        return (removesuffix(parquet_path.name, ".parquet"), parquet_path)
+        logger.info("Writer.save: saved %s to %s", name, parquet_path)
+        return (name, parquet_path)
 
     def remove(self, pq_name) -> bool:
         """
-        Removes a temporary table if it exists. Returns success of the operation.
+        Removes a temporary table if it exists. Returns success of the
+        operation.
 
         :param pq_name: name (w/o file extension) of the file to read
         :returns: bool indicating success of the removal
@@ -151,5 +188,7 @@ class Writer(ParquetManager):
         _, pq_path = self._get_parquet_file(pq_name, tmp=True)
         if pq_path.exists():
             os.remove(pq_path)
+            logger.info("Writer.remove: removed %s", pq_name)
             return True
+        logger.info("Writer.remove: %s could not be found at %s", pq_name, pq_path)
         return False
