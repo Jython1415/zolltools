@@ -9,24 +9,25 @@ from scipy import stats
 
 import zolltools.nemsis.locationcodes as locationcodes
 
+
 @pytest.mark.slow
 def test_get_mapping_performance():
     """
     measuring performance of get_mapping
-    
+
     Takes a sample of the execution time for the first and successive calls to
     `get_mapping` and determines that successive calls are at least
     `min_exp_speedup` times faster than the first calls within a certain
     confidence interval (see `alpha` and comparison to p-value in `assert`
     statement).
-    
+
     `min_exp_speedup` was determined with preliminary testing. See gh 74
     """
 
-    alpha = 0.05             # confidence threshold
-    min_exp_speedup = 40     # successive reads should be min_exp_speedup times faster
+    alpha = 0.05  # confidence threshold
+    min_exp_speedup = 40  # successive reads should be min_exp_speedup times faster
     num_data_points = 10_000
-    data = {"successive": [], "adjusted": []}
+    data = {"successive": [], "adjusted-first-read": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
         successive_read_upper_bound = 100
@@ -48,10 +49,13 @@ def test_get_mapping_performance():
 
         # Record measurements
         data["successive"].append(successive_read)
-        data["adjusted"].append(adjusted_first_read)
+        data["adjusted-first-read"].append(adjusted_first_read)
 
     t_check = stats.ttest_ind(
-        data["adjusted"], data["successive"], equal_var=False, alternative="greater"
+        data["adjusted-first-read"],
+        data["successive"],
+        equal_var=False,
+        alternative="greater",
     )
     assert t_check[1] < alpha
 
