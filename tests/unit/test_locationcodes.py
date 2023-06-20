@@ -15,7 +15,7 @@ def test_get_mapping_performance():
     measuring performance of get_mapping
 
     Takes a sample of the execution time for the first and successive calls to
-    `get_mapping` and determines that successive calls are at least
+    `get_mapping` and determines if successive calls are at least
     `min_exp_speedup` times faster than the first calls within a certain
     confidence interval (see `alpha` and comparison to p-value in `assert`
     statement).
