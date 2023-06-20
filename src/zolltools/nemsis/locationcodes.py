@@ -1,5 +1,6 @@
 """Module for working with Y92 codes"""
 
+import logging
 import json
 from pathlib import Path
 import argparse
@@ -9,6 +10,9 @@ from importlib import resources
 import zolltools
 from zolltools import strtools
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXT = ".json"
 
@@ -16,16 +20,24 @@ STORAGE_FOLDER_EXT = ".json"
 def get_mapping() -> dict:
     """Returns the Y92 mapping"""
 
+    log_prefix = "get_mapping"
+
+    logger.debug("%s: function called", log_prefix)
     root = resources.files(zolltools)
+    logger.debug("%s: root traversable created: %s", log_prefix, repr(root))
     mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
+    logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
-        return pickle.load(file)
+        logger.debug("%s: mapping file opened", log_prefix)
+        mapping = pickle.load(file)
+        logger.info("%s: mapping read from file", log_prefix)
+        return mapping
 
 
 def to_description(code, default=None, mapping=None):
     """
     Returns the description for the provided code
-    
+
     :param code: the code to get a description of
     :param default: the value to return if a description is not found. If set to `None`,
     a KeyError exception will be raised instead.
@@ -35,7 +47,10 @@ def to_description(code, default=None, mapping=None):
     :raises KeyError: if the code does not match the data dictionary for Y92 code listing
     """
 
+    log_prefix = "to_description"
+
     if mapping is None:
+        logger.debug("%s: mapping accessed with get_mapping", log_prefix)
         mapping = get_mapping()
 
     if code == "7701001":
@@ -47,6 +62,9 @@ def to_description(code, default=None, mapping=None):
         description = mapping[code]
     except KeyError as error:
         if default is None:
+            logger.error(
+                "%s: code (%s) not found in mapping %s", log_prefix, code, repr(mapping)
+            )
             raise KeyError(
                 f"{code} is an invalid code."
                 "Not in the NEMSIS data dictionary or Y92 code listings."
@@ -59,7 +77,11 @@ def to_description(code, default=None, mapping=None):
 def _get_storage_dir() -> Path:
     """Return a Path pointing to the directory holding the groupings"""
 
-    return Path.cwd().joinpath(STORAGE_FOLDER_NAME)
+    storage_dir_path = Path.cwd().joinpath(STORAGE_FOLDER_NAME)
+    logger.debug(
+        "_get_storage_dir: storage directory identified as %s", storage_dir_path
+    )
+    return storage_dir_path
 
 
 def get_grouping(name: str) -> dict:
@@ -71,18 +93,30 @@ def get_grouping(name: str) -> dict:
     :raises FileNotFoundError: when there is no grouping corresponding to `name`
     """
 
+    log_prefix = "get_grouping"
+
     storage_dir = _get_storage_dir()
     grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXT}")
+    logger.debug("%s: file path identified as %s", log_prefix, grouping_path)
 
     if not grouping_path.exists():
+        logger.error(
+            "%s: grouping file (%s) could not be found", log_prefix, grouping_path
+        )
         raise FileNotFoundError(
             f'"{name}" cannot be found. {grouping_path} does not exist.'
         )
 
     try:
         with open(grouping_path, "rb") as grouping_file:
-            return json.load(grouping_file)
+            logger.debug("%s: grouping file successfully opened", log_prefix)
+            grouping = json.load(grouping_file)
+            logger.debug("%s: grouping read from file", log_prefix)
+            return grouping
     except OSError as error:
+        logger.error(
+            "%s: grouping file (%s) could not be accessed", log_prefix, grouping_path
+        )
         raise OSError(f"{name} could not be accessed") from error
 
 
@@ -94,6 +128,7 @@ def _list():
     names = sorted(
         [strtools.removesuffix(path.name, STORAGE_FOLDER_EXT) for path in paths]
     )
+    logger.debug("_list: %d groupings identified: %s", len(names), repr(names))
 
     print("\n".join(names))
 
