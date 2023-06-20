@@ -1,4 +1,4 @@
-"""Module for working with Y92 codes"""
+"""Module for working with location codes"""
 
 import sys
 import time
@@ -29,7 +29,8 @@ class _MappingStorage:
 
 def get_mapping() -> dict:
     """
-    Returns the Y92 mapping. The first read will read the mapping from storage.
+    Returns the location code mapping. The first read will read the mapping from
+    storage.
 
     :returns: the location code mapping
     """
@@ -40,7 +41,7 @@ def get_mapping() -> dict:
     if _MappingStorage.mapping is not None:
         return _MappingStorage.mapping
     root = resources.files(zolltools)
-    mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
+    mapping_file = root.joinpath("nemsis", "data", "location-code-mapping.pkl")
     logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
         mapping = pickle.load(file)
@@ -60,12 +61,13 @@ def to_description(code, default=None, mapping=None):
     Returns the description for the provided code
 
     :param code: the code to get a description of
-    :param default: the value to return if a description is not found. If set to `None`,
-    a `KeyError` exception will be raised instead.
-    :param mapping: the mapping to use. If set to `None`, the function will use the mapping
-    provided in the module: `locationcodes.get_mapping()`
-    :returns: a description of the Y92 code, `code`
-    :raises KeyError: if the code does not match the data dictionary for Y92 code listing
+    :param default: the value to return if a description is not found. If set to
+    `None`, a `KeyError` exception will be raised instead.
+    :param mapping: the mapping to use. If set to `None`, the function will use
+    the mapping provided in the module: `locationcodes.get_mapping()`
+    :returns: a description of the location code, `code`
+    :raises KeyError: if the code does not match the data dictionary for
+    location code listing
     """
 
     log_prefix = "to_description"
@@ -88,7 +90,8 @@ def to_description(code, default=None, mapping=None):
             )
             raise KeyError(
                 f"{code} is an invalid code."
-                "Not in the NEMSIS data dictionary or Y92 code listings."
+                "Not in the location code mapping %s",
+                str(mapping)
             ) from error
         return default
 
@@ -107,7 +110,7 @@ def _get_storage_dir() -> Path:
 
 def get_grouping(name: str) -> dict:
     """
-    Returns a grouping of Y92 codes.
+    Returns a grouping of location codes.
 
     :param name: the name of the grouping to retrieve.
     :returns: a dict representing the grouping
