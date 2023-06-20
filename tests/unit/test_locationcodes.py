@@ -32,13 +32,13 @@ def test_get_mapping_performance():
         successive_read_lower_bound_incl = 100
         successive_read_upper_bound_incl = 200 # see gh 74 for boundary reasoning
 
-        # Record for the first read of the mapping
+        # Record the first read of the mapping
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()
         end_time = time.perf_counter_ns()
         adjusted_first_read = (end_time - start_time) / min_exp_speedup
 
-        # Record a later of the mapping (randomly selected)
+        # Record a later read of the mapping (randomly selected)
         read_to_test = random.randint(
             successive_read_lower_bound_incl, successive_read_upper_bound_incl
         )
