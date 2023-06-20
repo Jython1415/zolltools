@@ -1,18 +1,57 @@
 """Tests for strtools.py"""
 
+import time
 import timeit
-import hypothesis as hp
-import hypothesis.strategies as st
+import importlib
+import pandas as pd
+from scipy import stats
+
+# import hypothesis as hp
+# import hypothesis.strategies as st
 import zolltools.nemsis.locationcodes as locationcodes
 
 
 def test_get_mapping_performance():
     """measuring performance of get_mapping"""
 
-    result = timeit.timeit(
-        "_ = locationcodes.get_mapping()", globals=globals(), number=1_000_000
+    alpha = 0.05
+    min_exp_speedup = 40
+    num_data_points = 10_000
+    data = {"first": [], "successive": [], "adjusted": []}
+    for _ in range(num_data_points):
+        importlib.reload(locationcodes)
+        timeit_repeat_num = 1000
+        seconds_to_ns = 1e9
+
+        # Record for the first read of the mapping
+        start_time = time.perf_counter_ns()
+        _ = locationcodes.get_mapping()
+        end_time = time.perf_counter_ns()
+        first_read = end_time - start_time
+        adjusted_first_read = first_read / min_exp_speedup
+
+        # Record a second read of the mapping
+        successive_read = (
+            timeit.timeit(
+                "_ = locationcodes.get_mapping()",
+                number=timeit_repeat_num,
+                globals=globals(),
+            )
+            / timeit_repeat_num
+            * seconds_to_ns
+        )
+
+        # Record measurements
+        data["first"].append(first_read)
+        data["successive"].append(successive_read)
+        data["adjusted"].append(adjusted_first_read)
+
+    df = pd.DataFrame(data)
+    means = df.mean(axis=0)
+    t_check = stats.ttest_ind(
+        data["adjusted"], data["successive"], equal_var=False, alternative="greater"
     )
-    print(result)
+    assert t_check[1] < alpha
 
 
 def test_get_mapping_correctness():
