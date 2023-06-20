@@ -39,10 +39,10 @@ def test_get_mapping_performance():
         adjusted_first_read = (end_time - start_time) / min_exp_speedup
 
         # Record a later read of the mapping (randomly selected)
-        read_to_test = random.randint(
+        nth_read_to_test = random.randint(
             successive_read_lower_bound_incl, successive_read_upper_bound_incl
         )
-        for _ in range(read_to_test - 2): # -2, first read and the next (below)
+        for _ in range(nth_read_to_test - 2): # -2, first read and the next (below)
             _ = locationcodes.get_mapping()
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()
@@ -64,7 +64,9 @@ def test_get_mapping_performance():
 
 
 def test_get_mapping_correctness():
-    """testing output of get_mapping"""
+    """
+    testing output of get_mapping
+    """
 
     mapping = locationcodes.get_mapping()
 
