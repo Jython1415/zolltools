@@ -16,14 +16,14 @@ def test_get_mapping_performance():
 
     Takes a sample of the execution time for the first and successive calls to
     `get_mapping` and determines if successive calls are at least
-    `min_exp_speedup` times faster than the first calls within a certain
-    confidence interval (see `alpha` and comparison to p-value in `assert`
-    statement).
+    `min_exp_speedup` times faster than the first calls. The confidence of this
+    assertion is measured by a t-test, with the assertion being that the p-value
+    must be less than `alpha`.
 
     `min_exp_speedup` was determined with preliminary testing. See gh 74
     """
 
-    alpha = 0.05 # confidence threshold
+    alpha = 0.05 # max p-value (exclusive)
     min_exp_speedup = 10
     num_data_points = 100 # see gh 74 for reasoning
     data = {"successive": [], "adjusted-first-read": []}
