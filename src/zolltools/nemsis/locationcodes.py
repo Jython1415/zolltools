@@ -1,12 +1,14 @@
 """Module for working with Y92 codes"""
 
-import logging
-import json
-from pathlib import Path
-import argparse
 import sys
+import time
+import json
 import pickle
+import logging
+import argparse
+from pathlib import Path
 from importlib import resources
+
 import zolltools
 from zolltools import strtools
 
@@ -17,20 +19,39 @@ STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXT = ".json"
 
 
+class _MappingStorage:
+    """
+    Class to store the location code mapping once it is loaded from storage.
+    """
+
+    mapping = None
+
+
 def get_mapping() -> dict:
-    """Returns the Y92 mapping"""
+    """
+    Returns the Y92 mapping. The first read will read the mapping from storage.
+
+    :returns: the location code mapping
+    """
 
     log_prefix = "get_mapping"
 
-    logger.debug("%s: function called", log_prefix)
+    start_time = time.perf_counter_ns()
+    if _MappingStorage.mapping is not None:
+        return _MappingStorage.mapping
     root = resources.files(zolltools)
-    logger.debug("%s: root traversable created: %s", log_prefix, repr(root))
     mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
     logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
-        logger.debug("%s: mapping file opened", log_prefix)
         mapping = pickle.load(file)
-        logger.info("%s: mapping read from file", log_prefix)
+        _MappingStorage.mapping = mapping
+        end_time = time.perf_counter_ns()
+        logger.info(
+            "%s: mapping read from %s in %d ns",
+            log_prefix,
+            mapping_file,
+            end_time - start_time,
+        )
         return mapping
 
 
