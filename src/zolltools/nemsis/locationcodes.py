@@ -17,14 +17,19 @@ logger.addHandler(logging.NullHandler())
 STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXT = ".json"
 
+class _MappingStorage:
+    mapping = None
 
-def get_mapping() -> dict:
+
+def get_mapping(reload=False) -> dict:
     """Returns the Y92 mapping"""
 
     log_prefix = "get_mapping"
     logger.debug("%s: function called", log_prefix)
 
     start_time = time.perf_counter_ns()
+    if not reload and _MappingStorage.mapping is not None:
+        return _MappingStorage.mapping
     root = resources.files(zolltools)
     logger.debug("%s: root traversable created: %s", log_prefix, repr(root))
     mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
@@ -32,6 +37,7 @@ def get_mapping() -> dict:
     with mapping_file.open("rb") as file:
         logger.debug("%s: mapping file opened", log_prefix)
         mapping = pickle.load(file)
+        _MappingStorage.mapping = mapping
         end_time = time.perf_counter_ns()
         logger.info(
             "%s: mapping read from file in %d ns", log_prefix, end_time - start_time
