@@ -29,7 +29,7 @@ def test_get_mapping_performance():
     data = {"successive": [], "adjusted": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
-        timeit_repeat_num = 100
+        successive_read_upper_bound = 100
 
         # Record for the first read of the mapping
         start_time = time.perf_counter_ns()
@@ -38,8 +38,8 @@ def test_get_mapping_performance():
         adjusted_first_read = (end_time - start_time) / min_exp_speedup
 
         # Record a later of the mapping (randomly selected)
-        buffer_num = random.randint(1, timeit_repeat_num)
-        for _ in range(buffer_num):
+        read_to_test = random.randint(2, successive_read_upper_bound)
+        for _ in range(read_to_test - 2):
             _ = locationcodes.get_mapping()
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()
