@@ -14,8 +14,8 @@ import zolltools.nemsis.locationcodes as locationcodes
 def test_get_mapping_performance():
     """measuring performance of get_mapping"""
 
-    alpha = 0.05
-    min_exp_speedup = 40
+    alpha = 0.05             # confidence threshold
+    min_exp_speedup = 40     # successive reads should be min_exp_speedup times faster
     num_data_points = 10_000
     data = {"first": [], "successive": [], "adjusted": []}
     for _ in range(num_data_points):
@@ -46,8 +46,6 @@ def test_get_mapping_performance():
         data["successive"].append(successive_read)
         data["adjusted"].append(adjusted_first_read)
 
-    df = pd.DataFrame(data)
-    means = df.mean(axis=0)
     t_check = stats.ttest_ind(
         data["adjusted"], data["successive"], equal_var=False, alternative="greater"
     )
