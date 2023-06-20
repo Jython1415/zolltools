@@ -2,6 +2,7 @@
 
 import time
 import timeit
+import random
 import importlib
 
 import pytest
@@ -19,6 +20,8 @@ def test_get_mapping_performance():
     `min_exp_speedup` times faster than the first calls within a certain
     confidence interval (see `alpha` and comparison to p-value in `assert`
     statement).
+    
+    `min_exp_speedup` was determined with preliminary testing. See gh 74
     """
 
     alpha = 0.05             # confidence threshold
@@ -28,7 +31,6 @@ def test_get_mapping_performance():
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
         timeit_repeat_num = 100
-        seconds_to_ns = 1e9
 
         # Record for the first read of the mapping
         start_time = time.perf_counter_ns()
@@ -37,16 +39,14 @@ def test_get_mapping_performance():
         first_read = end_time - start_time
         adjusted_first_read = first_read / min_exp_speedup
 
-        # Record a second read of the mapping
-        successive_read = (
-            timeit.timeit(
-                "_ = locationcodes.get_mapping()",
-                number=timeit_repeat_num,
-                globals=globals(),
-            )
-            / timeit_repeat_num
-            * seconds_to_ns
-        )
+        # Record a later of the mapping (randomly selected)
+        buffer_num = random.randint(1, timeit_repeat_num)
+        for _ in range(buffer_num):
+            _ = locationcodes.get_mapping()
+        start_time = time.perf_counter_ns()
+        _ = locationcodes.get_mapping()
+        end_time = time.perf_counter_ns()
+        successive_read = end_time - start_time
 
         # Record measurements
         data["successive"].append(successive_read)
