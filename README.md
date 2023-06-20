@@ -13,6 +13,7 @@ for more information on how to format and handle the logs.
 
 ```Python
 import logging
+import zolltools
 
 sasconvert_logger = logging.getLogger("zolltools.db.sasconvert")
 sasconvert_logger.setLevel(logging.DEBUG)
