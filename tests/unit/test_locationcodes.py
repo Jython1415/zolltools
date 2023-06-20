@@ -7,7 +7,7 @@ import importlib
 import pytest
 from scipy import stats
 
-import zolltools.nemsis.locationcodes as locationcodes
+from zolltools.nemsis import locationcodes
 
 
 @pytest.mark.slow
