@@ -27,20 +27,17 @@ class _MappingStorage:
     mapping = None
 
 
-def get_mapping(reload=False) -> dict:
+def get_mapping() -> dict:
     """
     Returns the Y92 mapping. The first read will read the mapping from storage.
-    If `reload` is set to `True`, it will load the mapping from storage again.
 
-    :param reload: whether to read the mapping from storage, or use a cached
-    version
     :returns: the location code mapping
     """
 
     log_prefix = "get_mapping"
 
     start_time = time.perf_counter_ns()
-    if not reload and _MappingStorage.mapping is not None:
+    if _MappingStorage.mapping is not None:
         return _MappingStorage.mapping
     root = resources.files(zolltools)
     mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
