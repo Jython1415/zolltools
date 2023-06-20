@@ -184,10 +184,12 @@ class Writer(ParquetManager):
         :returns: bool indicating success of the removal
         """
 
+        log_prefix = "Writer.remove"
+
         _, pq_path = self._get_parquet_file(pq_name, tmp=True)
         if pq_path.exists():
             os.remove(pq_path)
-            logger.info("Writer.remove: removed %s", pq_name)
+            logger.info("%s: removed %s", log_prefix, pq_name)
             return True
-        logger.info("Writer.remove: %s could not be found at %s", pq_name, pq_path)
+        logger.info("%s: %s could not be found at %s", log_prefix, pq_name, pq_path)
         return False
