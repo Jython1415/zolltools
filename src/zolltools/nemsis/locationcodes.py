@@ -1,15 +1,15 @@
 """Module for working with Y92 codes"""
 
-import time
-import logging
-import json
-from pathlib import Path
-import argparse
 import sys
+import time
+import json
 import pickle
-from importlib import resources
+import logging
+import argparse
 import zolltools
+from pathlib import Path
 from zolltools import strtools
+from importlib import resources
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
