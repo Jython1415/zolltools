@@ -22,7 +22,14 @@ class _MappingStorage:
 
 
 def get_mapping(reload=False) -> dict:
-    """Returns the Y92 mapping"""
+    """
+    Returns the Y92 mapping. The first read will read the mapping from storage.
+    If `reload` is set to `True`, it will load the mapping from storage again.
+    
+    :param reload: whether to read the mapping from storage, or use a cached
+    version
+    :returns: the location code mapping
+    """
 
     log_prefix = "get_mapping"
     logger.debug("%s: function called", log_prefix)
