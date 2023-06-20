@@ -30,7 +30,8 @@ def test_get_mapping_performance():
     data = {"successive": [], "adjusted-first-read": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
-        successive_read_upper_bound = 100
+        successive_read_lower_bound_incl = 100
+        successive_read_upper_bound_incl = 200 # see gh 74 for boundary reasoning
 
         # Record for the first read of the mapping
         start_time = time.perf_counter_ns()
@@ -39,8 +40,10 @@ def test_get_mapping_performance():
         adjusted_first_read = (end_time - start_time) / min_exp_speedup
 
         # Record a later of the mapping (randomly selected)
-        read_to_test = random.randint(2, successive_read_upper_bound)
-        for _ in range(read_to_test - 2):
+        read_to_test = random.randint(
+            successive_read_lower_bound_incl, successive_read_upper_bound_incl
+        )
+        for _ in range(read_to_test - 2): # -2, first read and the next (below)
             _ = locationcodes.get_mapping()
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()
