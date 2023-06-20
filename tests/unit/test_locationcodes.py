@@ -1,7 +1,6 @@
 """Tests for strtools.py"""
 
 import time
-import timeit
 import random
 import importlib
 
@@ -36,8 +35,7 @@ def test_get_mapping_performance():
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()
         end_time = time.perf_counter_ns()
-        first_read = end_time - start_time
-        adjusted_first_read = first_read / min_exp_speedup
+        adjusted_first_read = (end_time - start_time) / min_exp_speedup
 
         # Record a later of the mapping (randomly selected)
         buffer_num = random.randint(1, timeit_repeat_num)
