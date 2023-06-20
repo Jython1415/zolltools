@@ -57,7 +57,8 @@ def test_get_mapping_performance():
         equal_var=False,
         alternative="greater",
     )
-    assert t_check[1] < alpha
+    p_value = t_check[1]
+    assert p_value < alpha
 
 
 def test_get_mapping_correctness():
