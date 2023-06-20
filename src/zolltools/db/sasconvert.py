@@ -113,7 +113,7 @@ class Converter:
             results.add(sas_frame.equals(parquet_frame))
             end_time = time.perf_counter()
             logger.debug(
-                "%s.iteration: %d, %f", log_prefix, index, end_time - start_time
+                "%s.iteration: %d, %d", log_prefix, index, end_time - start_time
             )
             start_time = time.perf_counter()
 
