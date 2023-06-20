@@ -56,15 +56,21 @@ class Converter:
     def _convert_sas(self, sas_path: Path) -> Path:
         """Converts a SAS file and returns the path to the generated parquet file"""
 
+        log_prefix = "Converter._convert_sas"
+
         chunk_size = self._get_chunk_size(sas_path)
-        logger.debug("Converter._convert_sas: chunk size for %s set to %d", sas_path, chunk_size)
+        logger.debug(
+            "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
+        )
 
         chunk_iterator = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
         parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
-            logger.error("Converter._convert_sas: aborted because %s already exists", parquet_path)
+            logger.error(
+                "%s: aborted because %s already exists", log_prefix, parquet_path
+            )
             raise FileExistsError(f"{parquet_path} already exists")
         start_time = time.perf_counter()
         for index, (chunk, _) in enumerate(chunk_iterator):
@@ -75,7 +81,9 @@ class Converter:
                     parquet_path, engine="fastparquet", index=False, append=True
                 )
             end_time = time.perf_counter()
-            logger.debug("Converter._convert_sas.iteration: %d, %f", index, end_time - start_time)
+            logger.debug(
+                "%s.iteration: %d, %f", log_prefix, index, end_time - start_time
+            )
             start_time = time.perf_counter()
 
         return parquet_path
@@ -83,10 +91,14 @@ class Converter:
     def _validate_parquet_file(self, parquet_path: Path) -> bool:
         """Returns whether the parquet file matches the corresponding SAS file"""
 
+        log_prefix = "Converter._validate_parquet_file"
+
         sas_path = Converter._get_sas_path(parquet_path)
         parquet_file = pq.ParquetFile(parquet_path)
         chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
-        logger.debug("Converter._validate_parquet_file: chunk size for %s set to %d", sas_path, chunk_size)
+        logger.debug(
+            "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
+        )
         sas_iter = pyreadstat.read_file_in_chunks(
             pyreadstat.read_sas7bdat, sas_path, chunksize=chunk_size
         )
@@ -101,7 +113,7 @@ class Converter:
             results.add(sas_frame.equals(parquet_frame))
             end_time = time.perf_counter()
             logger.debug(
-                "Converter._validate_parquet_file.iteration: %d, %f", index, end_time - start_time
+                "%s.iteration: %d, %f", log_prefix, index, end_time - start_time
             )
             start_time = time.perf_counter()
 
@@ -113,16 +125,18 @@ class Converter:
         Returns False if validation fails.
         """
 
+        log_prefix = "Converter.convert_sas"
+
         parquet_path = self._convert_sas(sas_path)
         if not self._validate_parquet_file(parquet_path):
-            logger.error("Converter.convert_sas: %s failed due to failed validation", sas_path)
+            logger.error("%s: %s failed due to failed validation", log_prefix, sas_path)
             return False
 
         sas_path = Converter._get_sas_path(parquet_path)
         with open(sas_path, "w", encoding="utf-8"):
             pass
         os.remove(sas_path)
-        logger.info("Converter.convert_sas: file %s deleted", sas_path)
+        logger.info("%s: file %s deleted", log_prefix, sas_path)
 
         return True
 
