@@ -20,15 +20,17 @@ STORAGE_FOLDER_EXT = ".json"
 def get_mapping() -> dict:
     """Returns the Y92 mapping"""
 
-    logger.debug("get_mapping: function called")
+    log_prefix = "get_mapping"
+
+    logger.debug("%s: function called", log_prefix)
     root = resources.files(zolltools)
-    logger.debug("get_mapping: root traversable created: %s", repr(root))
+    logger.debug("%s: root traversable created: %s", log_prefix, repr(root))
     mapping_file = root.joinpath("nemsis", "data", "y92-mapping.pkl")
-    logger.debug("get_mapping: identified mapping file: %s", repr(mapping_file))
+    logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
-        logger.debug("get_mapping: mapping file opened")
+        logger.debug("%s: mapping file opened", log_prefix)
         mapping = pickle.load(file)
-        logger.info("get_mapping: mapping read from file")
+        logger.info("%s: mapping read from file", log_prefix)
         return mapping
 
 
@@ -45,8 +47,10 @@ def to_description(code, default=None, mapping=None):
     :raises KeyError: if the code does not match the data dictionary for Y92 code listing
     """
 
+    log_prefix = "to_description"
+
     if mapping is None:
-        logger.debug("to_description: mapping accessed with get_mapping")
+        logger.debug("%s: mapping accessed with get_mapping", log_prefix)
         mapping = get_mapping()
 
     if code == "7701001":
@@ -59,7 +63,7 @@ def to_description(code, default=None, mapping=None):
     except KeyError as error:
         if default is None:
             logger.error(
-                "to_description: code (%s) not found in mapping %s", code, repr(mapping)
+                "%s: code (%s) not found in mapping %s", log_prefix, code, repr(mapping)
             )
             raise KeyError(
                 f"{code} is an invalid code."
@@ -74,7 +78,9 @@ def _get_storage_dir() -> Path:
     """Return a Path pointing to the directory holding the groupings"""
 
     storage_dir_path = Path.cwd().joinpath(STORAGE_FOLDER_NAME)
-    logger.debug("_get_storage_dir: storage directory identified as %s", storage_dir_path)
+    logger.debug(
+        "_get_storage_dir: storage directory identified as %s", storage_dir_path
+    )
     return storage_dir_path
 
 
@@ -87,24 +93,30 @@ def get_grouping(name: str) -> dict:
     :raises FileNotFoundError: when there is no grouping corresponding to `name`
     """
 
+    log_prefix = "get_grouping"
+
     storage_dir = _get_storage_dir()
     grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXT}")
-    logger.debug("get_grouping: file path identified as %s", grouping_path)
+    logger.debug("%s: file path identified as %s", log_prefix, grouping_path)
 
     if not grouping_path.exists():
-        logger.error("get_grouping: grouping file (%s) could not be found", grouping_path)
+        logger.error(
+            "%s: grouping file (%s) could not be found", log_prefix, grouping_path
+        )
         raise FileNotFoundError(
             f'"{name}" cannot be found. {grouping_path} does not exist.'
         )
 
     try:
         with open(grouping_path, "rb") as grouping_file:
-            logger.debug("get_grouping: grouping file successfully opened")
+            logger.debug("%s: grouping file successfully opened", log_prefix)
             grouping = json.load(grouping_file)
-            logger.debug("get_grouping: grouping read from file")
+            logger.debug("%s: grouping read from file", log_prefix)
             return grouping
     except OSError as error:
-        logger.error("get_grouping: grouping file (%s) could not be accessed", grouping_path)
+        logger.error(
+            "%s: grouping file (%s) could not be accessed", log_prefix, grouping_path
+        )
         raise OSError(f"{name} could not be accessed") from error
 
 
