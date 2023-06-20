@@ -2,6 +2,7 @@
 
 import time
 import timeit
+import pytest
 import importlib
 import pandas as pd
 from scipy import stats
@@ -10,7 +11,7 @@ from scipy import stats
 # import hypothesis.strategies as st
 import zolltools.nemsis.locationcodes as locationcodes
 
-
+@pytest.mark.slow
 def test_get_mapping_performance():
     """measuring performance of get_mapping"""
 
