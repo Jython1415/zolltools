@@ -102,9 +102,6 @@ def _get_storage_dir() -> Path:
     """Return a Path pointing to the directory holding the groupings"""
 
     storage_dir_path = Path.cwd().joinpath(STORAGE_FOLDER_NAME)
-    logger.debug(
-        "_get_storage_dir: storage directory identified as %s", storage_dir_path
-    )
     return storage_dir_path
 
 
@@ -152,7 +149,7 @@ def _list():
     names = sorted(
         [strtools.removesuffix(path.name, STORAGE_FOLDER_EXT) for path in paths]
     )
-    logger.debug("_list: %d groupings identified: %s", len(names), repr(names))
+    logger.debug("_list: %d groupings identified in %s: %s", len(names), storage_dir, repr(names))
 
     print("\n".join(names))
 
