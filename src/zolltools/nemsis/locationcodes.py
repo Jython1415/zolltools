@@ -6,10 +6,11 @@ import json
 import pickle
 import logging
 import argparse
-import zolltools
 from pathlib import Path
-from zolltools import strtools
 from importlib import resources
+
+import zolltools
+from zolltools import strtools
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
