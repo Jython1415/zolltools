@@ -2,13 +2,11 @@
 
 import time
 import timeit
-import pytest
 import importlib
-import pandas as pd
+
+import pytest
 from scipy import stats
 
-# import hypothesis as hp
-# import hypothesis.strategies as st
 import zolltools.nemsis.locationcodes as locationcodes
 
 @pytest.mark.slow
