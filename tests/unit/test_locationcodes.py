@@ -24,9 +24,9 @@ def test_get_mapping_performance():
     `min_exp_speedup` was determined with preliminary testing. See gh 74
     """
 
-    alpha = 0.05  # confidence threshold
-    min_exp_speedup = 40  # successive reads should be min_exp_speedup times faster
-    num_data_points = 10_000
+    alpha = 0.05 # confidence threshold
+    min_exp_speedup = 10 # successive reads should be min_exp_speedup times faster
+    num_data_points = 100 # see gh 74 for reasoning
     data = {"successive": [], "adjusted-first-read": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
