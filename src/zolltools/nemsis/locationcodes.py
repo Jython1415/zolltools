@@ -147,7 +147,7 @@ def _list():
         [strtools.removesuffix(path.name, STORAGE_FOLDER_EXTENSION) for path in paths]
     )
     logger.debug(
-        "_list: %d groupings identified in %s: %s", len(names), storage_dir, repr(names)
+        "_list: %d groupings identified in %s: %s", len(names), storage_dir, str(names)
     )
 
     print("\n".join(names))
