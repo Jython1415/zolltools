@@ -82,6 +82,13 @@ class ParquetManager:
         Estimates the number of rows that will keep the in-memory size of the
         chunk close to the target_in_memory_size (or
         `default_target_in_memory_size` if the value is not provided).
+        
+        :param pq_name: the file to calculate chunk size for
+        :param tmp: the directory the file is in
+        :param target_in_memory_size: the target in-memory size for the chunk
+        :returns: the integer number of rows that should be included in each
+        chunk to get the in-memory size of the chunk close to the
+        `target_in_memory_size`
         """
 
         if target_in_memory_size is None:
