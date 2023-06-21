@@ -189,6 +189,14 @@ class Reader(ParquetManager):
         for batch in pq_iter:
             yield batch.to_pandas()
 
+    def get_table(self, pq_name: str, tmp=True) -> pd.DataFrame:
+        """
+        Gets a table (`pq_name`) from the database.
+        
+        :param pq_name: the name (w/o file extension) of the file to read
+        :param columns: columns of the 
+        """
+
     def get_reader(
         self, pq_name: str, columns=None, target_in_memory_size=None, tmp=True
     ) -> GeneratorType:
