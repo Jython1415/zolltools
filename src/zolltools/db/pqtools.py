@@ -40,16 +40,16 @@ class ParquetManager:
     def __init__(self, config: Config):
         self.config = config
 
-    def _get_dir_path(self,tmp: bool):
+    def _get_dir_path(self, tmp: bool):
         """
         Returns the directory path depending on whether `tmp` (temporary
         directory) is selected or not.
-        
+
         :param tmp: When `False`, returns `self.config.db_path`, otherwise
         returns `self.config.tmp_path`
         :returns: path to directory
         """
-        
+
         return self.config.tmp_path if tmp else self.config.db_path
 
     def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
@@ -82,7 +82,7 @@ class ParquetManager:
         Estimates the number of rows that will keep the in-memory size of the
         chunk close to the target_in_memory_size (or
         `default_target_in_memory_size` if the value is not provided).
-        
+
         :param pq_name: the file to calculate chunk size for
         :param tmp: the directory the file is in
         :param target_in_memory_size: the target in-memory size for the chunk
@@ -90,6 +90,8 @@ class ParquetManager:
         chunk to get the in-memory size of the chunk close to the
         `target_in_memory_size`
         """
+
+        log_prefix = "ParquetManager._calc_chunk_size"
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
@@ -99,7 +101,8 @@ class ParquetManager:
         size = row.memory_usage(index=True, deep=True).sum()
         num_rows = math.floor(target_in_memory_size / size)
         logger.debug(
-            "ParquetManager._calc_chunk_size: calculated chunk size to be %d rows",
+            "%s: calculated chunk size to be %d rows",
+            log_prefix,
             num_rows,
         )
         return num_rows
