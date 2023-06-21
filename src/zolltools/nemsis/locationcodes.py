@@ -178,7 +178,6 @@ def _main():
         help="important help message",
     )
 
-    # TODO: FIND FIRST ITEM IN sys.argv[] THAT STARTS WITH "locationcodes"
     args = parser.parse_args(sys.argv[1:])
 
     if args.action == "list":
