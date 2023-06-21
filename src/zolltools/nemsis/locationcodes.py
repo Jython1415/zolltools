@@ -20,9 +20,7 @@ STORAGE_FOLDER_EXTENSION = ".json"
 
 
 class _MappingStorage:
-    """
-    Class to store the location code mapping once it is loaded from storage.
-    """
+    """Class to store the location code mapping once it is loaded from storage."""
 
     mapping = None
 
