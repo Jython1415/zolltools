@@ -1,4 +1,4 @@
-"""Tests for strtools.py"""
+"""Tests for locationcodes.py"""
 
 import time
 import random
