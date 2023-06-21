@@ -1,4 +1,4 @@
-"""Module for reading parquet files in a database."""
+"""Module for reading and writing parquet files."""
 
 import logging
 import math
