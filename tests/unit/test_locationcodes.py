@@ -65,9 +65,7 @@ def test_get_mapping_performance():
 
 
 def test_get_mapping_correctness():
-    """
-    Tests return from get_mapping
-    """
+    """Tests the result of from get_mapping"""
 
     mapping = locationcodes.get_mapping()
 
