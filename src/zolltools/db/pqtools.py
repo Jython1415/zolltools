@@ -1,12 +1,13 @@
 """Module for reading and writing parquet files."""
 
-import logging
-import math
-from pathlib import Path
 import os
+import math
+import logging
+from pathlib import Path
 from types import GeneratorType
-import pyarrow.parquet as pq
+
 import pandas as pd
+import pyarrow.parquet as pq
 from ..strtools import removesuffix
 
 logger = logging.getLogger(__name__)
