@@ -99,7 +99,10 @@ class Converter:
 
         sas_path = Converter._get_sas_path(parquet_path)
         parquet_file = pq.ParquetFile(parquet_path)
+        
+        # Divide by two because two chunks will be read simultaneously
         chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
+        
         logger.debug(
             "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
         )
