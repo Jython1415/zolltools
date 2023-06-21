@@ -188,9 +188,11 @@ class Converter:
             self.result_set.add(self.converter.convert_sas(self.sas_path))
 
     def convert_sas_database(self) -> bool:
-        """Converts all SAS files in the input directory and deletes the original files.
-        Returns True if the conversion succeeds.
-        Returns False if any of the files are not converted successfully.
+        """
+        Converts all SAS files in the input directory and deletes the original
+        files. Returns the success of the entire conversion.
+        
+        :returns: True if all conversions succeeded, False otherwise
         """
 
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
