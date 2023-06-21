@@ -14,32 +14,30 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class ParquetManagerConfig:
-    """
-    Class that represents the configuration of a parquet manager
-    """
-
-    def __init__(
-        self, db_path: Path = Path.cwd(), default_target_in_memory_size: int = int(1e8)
-    ):
-        """
-        Initializes a new Reader object
-        """
-
-        self.db_path = db_path
-        self.default_target_in_memory_size = default_target_in_memory_size
-        self.tmp_path = db_path.joinpath("tmp")
-        if not self.tmp_path.exists():
-            os.mkdir(self.tmp_path)
-        logger.debug(
-            "ParquetManagerConfig.__init__: new configuration created %s", repr(self)
-        )
-
-
 class ParquetManager:
     """Class that represents an object that interfaces with a parquet database"""
 
-    def __init__(self, config: ParquetManagerConfig):
+    class Config:  # pylint: disable=too-few-public-methods
+        """Class that represents the configuration of a parquet manager"""
+
+        def __init__(
+            self,
+            db_path: Path = Path.cwd(),
+            default_target_in_memory_size: int = int(1e8),
+        ):
+            """Initializes a new Reader object"""
+
+            self.db_path = db_path
+            self.default_target_in_memory_size = default_target_in_memory_size
+            self.tmp_path = db_path.joinpath("tmp")
+            if not self.tmp_path.exists():
+                os.mkdir(self.tmp_path)
+            logger.debug(
+                "ParquetManagerConfig.__init__: new configuration created %s",
+                repr(self),
+            )
+
+    def __init__(self, config: Config):
         self.config = config
 
     def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
