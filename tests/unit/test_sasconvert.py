@@ -33,7 +33,7 @@ def test_get_parquet_path_with_name(sas_file_name: str):
 
 
 def main():
-    """Run when file is executed"""
+    """Does nothing"""
 
 
 if __name__ == "__main__":
