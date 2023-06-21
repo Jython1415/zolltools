@@ -19,7 +19,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Healthcare Industry",
-    "Topic :: Scientific/Engineering" # TODO probably a better topic available
+    "Topic :: Scientific/Engineering :: Medical Science Apps."
 ]
 dependencies = [
   "pandas>=0.4",
