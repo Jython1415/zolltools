@@ -40,6 +40,9 @@ class ParquetManager:
     def __init__(self, config: Config):
         self.config = config
 
+    def _get_dir_path(self,tmp: bool):
+        return self.config.tmp_path if tmp else self.config.db_path
+
     def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
         """
         Returns the parquet file object and Path object given the name (w/o the
@@ -52,7 +55,7 @@ class ParquetManager:
         """
 
         file_name = f"{pq_name}.parquet"
-        dir_path = self.config.tmp_path if tmp else self.config.db_path
+        dir_path = self._get_dir_path(tmp)
         file_path = dir_path.joinpath(file_name)
         logger.debug(
             "ParquetManager._get_parquet_file: returned path and "
@@ -96,7 +99,7 @@ class ParquetManager:
         :returns: a list of names (str)
         """
 
-        dir_path = self.config.tmp_path if tmp else self.config.db_path
+        dir_path = self._get_dir_path(tmp)
         logger.debug("ParquetManager.get_tables: reading from %s", dir_path)
         return sorted(
             [
@@ -111,7 +114,7 @@ class ParquetManager:
         determines what directory will be searched.
         """
 
-        dir_path = self.config.tmp_path if tmp else self.config.db_path
+        dir_path = self._get_dir_path(tmp)
         logger.debug("ParquetManager.get_table_paths: reading from %s", dir_path)
         return list(dir_path.glob("*.parquet"))
 
