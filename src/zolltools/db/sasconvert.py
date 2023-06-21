@@ -29,7 +29,7 @@ class Converter:
     def _get_sas_path(parquet_path: Path) -> Path:
         """
         Returns a Path to the SAS file corresponding to the input parquet file
-        
+
         :param parquet_path: the path to the parquet file to find the
         corresponding SAS file for
         :returns: Path to SAS file
@@ -43,12 +43,12 @@ class Converter:
     def _get_parquet_path(sas_path: Path) -> Path:
         """
         Returns a Path to the parquet file corresponding to the input SAS file
-        
+
         :param sas_path: the path to the SAS file to find the corresponding
         parquet file for
         :returns: Path to parquet file
         """
-        
+
         parquet_path = sas_path.parent.joinpath(
             f"{strtools.removesuffix(sas_path.name, '.sas7bdat')}.parquet"
         )
@@ -63,6 +63,7 @@ class Converter:
         :param sas_path: the Path to the SAS file to calculate chunk size for.
         :returns: an integer number of rows to include in each chunk.
         """
+
         row, _ = next(
             pyreadstat.read_file_in_chunks(
                 pyreadstat.read_sas7bdat, sas_path, chunksize=1
