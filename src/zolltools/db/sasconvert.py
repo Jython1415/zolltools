@@ -41,9 +41,13 @@ class Converter:
         return parquet_path
 
     def _get_chunk_size(self, sas_path: Path) -> int:
-        """Returns the optimal chunk size for reading a SAS file.
+        """
+        Returns the optimal chunk size for reading a SAS file.
         Estimates the number of rows that will keep the in-memory
         size of the chunk close to target_in_memory_size.
+        
+        :param sas_path: the Path to the SAS file to calculate chunk size for.
+        :returns: an integer number of rows to include in each chunk.
         """
         row, _ = next(
             pyreadstat.read_file_in_chunks(
