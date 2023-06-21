@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 STORAGE_FOLDER_NAME = "location-codes-groupings"
-STORAGE_FOLDER_EXT = ".json"
+STORAGE_FOLDER_EXTENSION = ".json"
 
 
 class _MappingStorage:
@@ -117,7 +117,7 @@ def get_grouping(name: str) -> dict:
     log_prefix = "get_grouping"
 
     storage_dir = _get_storage_dir()
-    grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXT}")
+    grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXTENSION}")
     logger.debug("%s: file path identified as %s", log_prefix, grouping_path)
 
     if not grouping_path.exists():
@@ -145,9 +145,9 @@ def _list():
     """Lists location code groupings"""
 
     storage_dir = _get_storage_dir()
-    paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXT}")
+    paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXTENSION}")
     names = sorted(
-        [strtools.removesuffix(path.name, STORAGE_FOLDER_EXT) for path in paths]
+        [strtools.removesuffix(path.name, STORAGE_FOLDER_EXTENSION) for path in paths]
     )
     logger.debug("_list: %d groupings identified in %s: %s", len(names), storage_dir, repr(names))
 
