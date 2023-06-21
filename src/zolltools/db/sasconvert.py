@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import time
-import logging
-from pathlib import Path
 import os
+import time
 import math
+import logging
 import threading
+from pathlib import Path
+
 import pyreadstat
 import pyarrow.parquet as pq
 from .. import strtools
@@ -45,7 +46,7 @@ class Converter:
         Returns the optimal chunk size for reading a SAS file.
         Estimates the number of rows that will keep the in-memory
         size of the chunk close to target_in_memory_size.
-        
+
         :param sas_path: the Path to the SAS file to calculate chunk size for.
         :returns: an integer number of rows to include in each chunk.
         """
@@ -99,10 +100,10 @@ class Converter:
 
         sas_path = Converter._get_sas_path(parquet_path)
         parquet_file = pq.ParquetFile(parquet_path)
-        
+
         # Divide by two because two chunks will be read simultaneously
         chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
-        
+
         logger.debug(
             "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
         )
@@ -130,7 +131,7 @@ class Converter:
         Converts the input SAS file and deletes it if the conversion is
         successful.  Returns True upon success. Returns False if validation
         fails.
-        
+
         :param sas_path: the Path to the file to convert
         :returns: success of the operation (bool)
         """
