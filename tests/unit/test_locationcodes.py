@@ -12,7 +12,8 @@ from zolltools.nemsis import locationcodes
 @pytest.mark.slow
 def test_get_mapping_performance():
     """
-    measuring performance of get_mapping
+    Measures the performance of get_mapping. Checks speed-up for successive
+    calls to the method.
 
     Takes a sample of the execution time for the first and successive calls to
     `get_mapping` and determines if successive calls are at least
@@ -65,7 +66,7 @@ def test_get_mapping_performance():
 
 def test_get_mapping_correctness():
     """
-    testing output of get_mapping
+    Tests return from get_mapping
     """
 
     mapping = locationcodes.get_mapping()
