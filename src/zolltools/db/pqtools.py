@@ -25,7 +25,13 @@ class ParquetManager:
             db_path: Path = Path.cwd(),
             default_target_in_memory_size: int = int(1e8),
         ):
-            """Initializes a new Reader object"""
+            """
+            Initializes a new Config object
+            
+            :param db_path: the path to the folder containing the parquet files
+            :param default_target_in_memory_size: the default target memory size
+            to use when loading chunks of large tables into memory
+            """
 
             self.db_path = db_path
             self.default_target_in_memory_size = default_target_in_memory_size
@@ -58,6 +64,12 @@ class ParquetManager:
             )
 
     def __init__(self, config: Config):
+        """
+        Initializes a new ParquetManager with a configuration
+        
+        :param config: the configuration to use
+        """
+        
         self.config = config
 
     def _get_dir_path(self, tmp: bool):
