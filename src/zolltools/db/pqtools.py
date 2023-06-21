@@ -131,6 +131,9 @@ class ParquetManager:
         """
         Returns a list of parquet files as Path objects. The tmp parameter
         determines what directory will be searched.
+        
+        :param tmp: determines which directory will be searched
+        ;returns: list of Path objects
         """
 
         dir_path = self._get_dir_path(tmp)
