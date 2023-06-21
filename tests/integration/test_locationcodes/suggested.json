@@ -1,0 +1,106 @@
+{
+    "name": "suggested",
+    "grouping": [
+        {
+            "id": 0,
+            "groupName": "commercial",
+            "codes": [
+                "Y92.520",
+                "Y92.39",
+                "Y92.6",
+                "Y92.5",
+                "Y92.511",
+                "Y92.51",
+                "Y92.59",
+                "Y92.512"
+            ]
+        },
+        {
+            "id": 1,
+            "groupName": "healthcare",
+            "codes": [
+                "Y92.531",
+                "Y92.23",
+                "Y92.12",
+                "Y92.538",
+                "Y92.532",
+                "Y92.230"
+            ]
+        },
+        {
+            "id": 3,
+            "groupName": "Institutional Residence",
+            "codes": [
+                "Y92.1",
+                "Y92.14",
+                "Y92.10",
+                "Y92.19"
+            ]
+        },
+        {
+            "id": 4,
+            "groupName": "Other",
+            "codes": [
+                "Y92.89",
+                "Y92.13",
+                "Y92.8",
+                "Y92.22",
+                "Y92.9"
+            ]
+        },
+        {
+            "id": 5,
+            "groupName": "Private Residence",
+            "codes": [
+                "Y92.03",
+                "Y92.02",
+                "Y92.09",
+                "Y92.0",
+                "Y92.00",
+                "Y92.008",
+                "Y92.01"
+            ]
+        },
+        {
+            "id": 6,
+            "groupName": "Recreational",
+            "codes": [
+                "Y92.29",
+                "Y92.830",
+                "Y92.34",
+                "Y92.838",
+                "Y92.3"
+            ]
+        },
+        {
+            "id": 7,
+            "groupName": "School",
+            "codes": [
+                "Y92.210",
+                "Y92.21",
+                "Y92.16",
+                "Y92.219"
+            ]
+        },
+        {
+            "id": 8,
+            "groupName": "Street/Road",
+            "codes": [
+                "Y92.481",
+                "Y92.480",
+                "Y92.4",
+                "Y92.41",
+                "Y92.414",
+                "Y92.48"
+            ]
+        },
+        {
+            "id": 2,
+            "groupName": "NOT values",
+            "codes": [
+                "7701001",
+                "7701003"
+            ]
+        }
+    ]
+}
