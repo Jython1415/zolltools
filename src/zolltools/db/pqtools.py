@@ -41,6 +41,15 @@ class ParquetManager:
         self.config = config
 
     def _get_dir_path(self,tmp: bool):
+        """
+        Returns the directory path depending on whether `tmp` (temporary
+        directory) is selected or not.
+        
+        :param tmp: When `False`, returns `self.config.db_path`, otherwise
+        returns `self.config.tmp_path`
+        :returns: path to directory
+        """
+        
         return self.config.tmp_path if tmp else self.config.db_path
 
     def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
