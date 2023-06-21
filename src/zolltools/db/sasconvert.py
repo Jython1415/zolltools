@@ -113,9 +113,8 @@ class Converter:
 
         results = set()
         start_time = time.perf_counter()
-        for index, ((sas_frame, _), parquet_batch) in enumerate(
-            zip(sas_iter, parquet_iter)
-        ):
+        combined_chunk_iterable = enumerate(zip(sas_iter, parquet_iter))
+        for index, ((sas_frame, _), parquet_batch) in combined_chunk_iterable:
             parquet_frame = parquet_batch.to_pandas()
             results.add(sas_frame.equals(parquet_frame))
             end_time = time.perf_counter()
