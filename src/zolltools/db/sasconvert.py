@@ -126,9 +126,13 @@ class Converter:
         return False not in results
 
     def convert_sas(self, sas_path: Path) -> bool:
-        """Converts the input SAS file and deletes it if the conversion is successful.
-        Returns True upon success.
-        Returns False if validation fails.
+        """
+        Converts the input SAS file and deletes it if the conversion is
+        successful.  Returns True upon success. Returns False if validation
+        fails.
+        
+        :param sas_path: the Path to the file to convert
+        :returns: success of the operation (bool)
         """
 
         log_prefix = "Converter.convert_sas"
