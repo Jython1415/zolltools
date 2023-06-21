@@ -87,9 +87,8 @@ def to_description(code, default=None, mapping=None):
                 "%s: code (%s) not found in mapping %s", log_prefix, code, repr(mapping)
             )
             raise KeyError(
-                f"{code} is an invalid code."
-                "Not in the location code mapping %s",
-                str(mapping)
+                f"{code} is an invalid code." "Not in the location code mapping %s",
+                str(mapping),
             ) from error
         return default
 
@@ -147,14 +146,16 @@ def _list():
     names = sorted(
         [strtools.removesuffix(path.name, STORAGE_FOLDER_EXTENSION) for path in paths]
     )
-    logger.debug("_list: %d groupings identified in %s: %s", len(names), storage_dir, repr(names))
+    logger.debug(
+        "_list: %d groupings identified in %s: %s", len(names), storage_dir, repr(names)
+    )
 
     print("\n".join(names))
 
 
 def _validate():
     """Validates a location code grouping"""
-    
+
     print("This command is still WIP...")
 
 
@@ -169,7 +170,7 @@ def _init():
 
 def main():
     """Method that defines the logic of the module when executed."""
-    
+
     parser = argparse.ArgumentParser(description="module description")
     parser.add_argument(
         "action",
@@ -187,7 +188,7 @@ def main():
     elif args.action == "init":
         _init()
     else:
-        print("this should not have happened...")
+        raise ValueError(f"Bad argument: {args.action}")
 
 
 if __name__ == "__main__":
