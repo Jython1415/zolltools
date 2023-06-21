@@ -161,7 +161,10 @@ class Reader(ParquetManager):
     def _pq_generator(pq_iter) -> pd.DataFrame:
         """
         Generator that wrap an iterator for reading a parquet file in chunks.
-        The generator returns pandas.DataFrame objects instead of parquet batches.
+        The generator returns pandas.DataFrame objects instead of parquet
+        batches.
+        
+        :param pq_iter: the iterator for the parquet file to wrap
         """
 
         for batch in pq_iter:
