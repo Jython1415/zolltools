@@ -41,7 +41,14 @@ class Converter:
 
     @staticmethod
     def _get_parquet_path(sas_path: Path) -> Path:
-        """Returns a Path to the parquet file corresponding to the input SAS file"""
+        """
+        Returns a Path to the parquet file corresponding to the input SAS file
+        
+        :param sas_path: the path to the SAS file to find the corresponding
+        parquet file for
+        :returns: Path to parquet file
+        """
+        
         parquet_path = sas_path.parent.joinpath(
             f"{strtools.removesuffix(sas_path.name, '.sas7bdat')}.parquet"
         )
