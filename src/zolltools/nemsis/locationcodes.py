@@ -154,6 +154,8 @@ def _list():
 
 def _validate():
     """Validates a location code grouping"""
+    
+    print("This command is still WIP...")
 
 
 def _init():
