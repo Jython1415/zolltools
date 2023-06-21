@@ -37,6 +37,19 @@ class ParquetManager:
                 repr(self),
             )
 
+        def __str__(self):
+            return (
+                f"Config\n\tDatabase: {self.db_path}\n\t"
+                f"Temporary: {self.tmp_path}\n\t"
+                f"Target Memory: {self.default_target_in_memory_size}"
+            )
+
+        def __repr__(self):
+            return (
+                f"Config({self.db_path}, {self.tmp_path}, "
+                f"{self.default_target_in_memory_size})"
+            )
+
     def __init__(self, config: Config):
         self.config = config
 
@@ -131,7 +144,7 @@ class ParquetManager:
         """
         Returns a list of parquet files as Path objects. The tmp parameter
         determines what directory will be searched.
-        
+
         :param tmp: determines which directory will be searched
         ;returns: list of Path objects
         """
