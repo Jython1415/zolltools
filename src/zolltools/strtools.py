@@ -11,9 +11,3 @@ def removesuffix(string, suffix) -> str:
     if len(suffix) != 0 and string.endswith(suffix):
         return string[:-len(suffix)]
     return string
-
-def main():
-    """Method that is run if this file is executed"""
-
-if __name__ == "__main__":
-    main()

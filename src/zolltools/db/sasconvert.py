@@ -208,11 +208,3 @@ class Converter:
         for thread in threads:
             thread.join()
         return False not in conversion_results
-
-
-def _main():
-    pass
-
-
-if __name__ == "__main__":
-    _main()

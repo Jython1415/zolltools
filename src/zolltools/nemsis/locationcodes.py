@@ -168,7 +168,7 @@ def _init():
     print(f"Store location code groupings in {STORAGE_FOLDER_NAME}\n> {storage_dir}")
 
 
-def main():
+def _main():
     """Method that defines the logic of the module when executed."""
 
     parser = argparse.ArgumentParser(description="module description")
@@ -192,4 +192,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    _main()
