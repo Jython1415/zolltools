@@ -169,6 +169,7 @@ def _init():
 
 def main():
     """Method that defines the logic of the module when executed."""
+    
     parser = argparse.ArgumentParser(description="module description")
     parser.add_argument(
         "action",
@@ -176,7 +177,7 @@ def main():
         help="important help message",
     )
 
-    # FIND FIRST ITEM IN sys.argv[] THAT STARTS WITH "locationcodes"
+    # TODO: FIND FIRST ITEM IN sys.argv[] THAT STARTS WITH "locationcodes"
     args = parser.parse_args(sys.argv[1:])
 
     if args.action == "list":
