@@ -38,6 +38,8 @@ class ParquetManager:
             )
 
         def __str__(self):
+            """Returns a user-friendly string representation"""
+            
             return (
                 f"Config\n\tDatabase: {self.db_path}\n\t"
                 f"Temporary: {self.tmp_path}\n\t"
@@ -45,6 +47,11 @@ class ParquetManager:
             )
 
         def __repr__(self):
+            """
+            Returns a developer-friendly string representation. Format is
+            "Config({db_path}, {tmp_path}, {default_target_in_memory_size})"
+            """
+            
             return (
                 f"Config({self.db_path}, {self.tmp_path}, "
                 f"{self.default_target_in_memory_size})"
