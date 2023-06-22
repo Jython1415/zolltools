@@ -189,14 +189,12 @@ class Converter:
         def __init__(
             self,
             thread_id: int,
-            name: str,
             converter: Converter,
             sas_path: Path,
             result_set: set,
         ):
             threading.Thread.__init__(self)
             self.thread_id = thread_id
-            self.name = name
             self.converter = converter
             self.sas_path = sas_path
             self.result_set = result_set
@@ -217,7 +215,7 @@ class Converter:
         conversion_results: set = set()
         threads = [
             Converter.ConvertThread(
-                index, sas_path.name, self, sas_path, conversion_results
+                index, self, sas_path, conversion_results
             )
             for index, sas_path in enumerate(sas_paths)
         ]
