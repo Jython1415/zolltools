@@ -3,7 +3,7 @@
 import pytest
 import hypothesis as hp
 import hypothesis.strategies as st
-import zolltools.strtools as strtools
+from zolltools import strtools
 
 
 @hp.given(prefix=st.text())
@@ -28,10 +28,10 @@ def test_removeprefix_empty_prefix(string: str):
         ("abc", "a", "bc"),
     ],
 )
-def test_removeprefix_with_matching_prefix(input, prefix, expected):
+def test_removeprefix_with_matching_prefix(string, prefix, expected):
     """removeprefix test with a prefix that matches"""
 
-    assert strtools.removeprefix(input, prefix) == expected
+    assert strtools.removeprefix(string, prefix) == expected
 
 
 @pytest.mark.parametrize(
@@ -42,10 +42,10 @@ def test_removeprefix_with_matching_prefix(input, prefix, expected):
         ("abc123456", "456"),
     ],
 )
-def test_removeprefix_with_nonmatching_prefix(input, prefix):
+def test_removeprefix_with_nonmatching_prefix(string, prefix):
     """removeprefix test with a prefix that does not match"""
 
-    assert strtools.removeprefix(input, prefix) == input
+    assert strtools.removeprefix(string, prefix) == string
 
 
 @hp.given(suffix=st.text())
@@ -70,10 +70,10 @@ def test_removesuffix_empty_suffix(string: str):
         ("abc", "c", "ab"),
     ],
 )
-def test_removesuffix_with_matching_suffix(input, suffix, expected):
+def test_removesuffix_with_matching_suffix(string, suffix, expected):
     """removesuffix test with a suffix that matches"""
 
-    assert strtools.removesuffix(input, suffix) == expected
+    assert strtools.removesuffix(string, suffix) == expected
 
 
 @pytest.mark.parametrize(
@@ -84,12 +84,10 @@ def test_removesuffix_with_matching_suffix(input, suffix, expected):
         ("abc123456", "abc"),
     ],
 )
-def test_removesuffix_with_nonmatching_suffix(input, suffix):
+def test_removesuffix_with_nonmatching_suffix(string, suffix):
     """removesuffix test with a suffix that does not match"""
 
-    assert strtools.removesuffix(input, suffix) == input
-    assert strtools.removesuffix(input, suffix) == input
-    assert strtools.removesuffix(input, suffix) == input
+    assert strtools.removesuffix(string, suffix) == string
 
 
 def main():
