@@ -192,9 +192,9 @@ class Reader(ParquetManager):
     def get_table(self, pq_name: str, tmp=True) -> pd.DataFrame:
         """
         Gets a table (`pq_name`) from the database.
-        
+
         :param pq_name: the name (w/o file extension) of the file to read
-        :param columns: columns of the 
+        :param columns: columns of the
         """
 
     def get_reader(

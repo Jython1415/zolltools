@@ -61,13 +61,14 @@ def test_removesuffix_empty_suffix(string: str):
 
     assert strtools.removesuffix(string, "") == string
 
+
 @pytest.mark.parametrize(
     ("input", "suffix", "expected"),
     [
         ("abcabcabc", "abc", "abcabc"),
         ("abc123456", "456", "abc123"),
         ("abc", "c", "ab"),
-    ]
+    ],
 )
 def test_removesuffix_with_matching_suffix(input, suffix, expected):
     """removesuffix test with a suffix that matches"""
@@ -81,7 +82,7 @@ def test_removesuffix_with_matching_suffix(input, suffix, expected):
         ("abcabcabc", "bac"),
         ("abc123456", "123"),
         ("abc123456", "abc"),
-    ]
+    ],
 )
 def test_removesuffix_with_nonmatching_suffix(input, suffix):
     """removesuffix test with a suffix that does not match"""
