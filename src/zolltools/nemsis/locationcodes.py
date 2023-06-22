@@ -18,7 +18,7 @@ logger.addHandler(logging.NullHandler())
 STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXTENSION = ".json"
 
-_MAPPING = None
+_MAPPING = None  # Stores the mapping once it is loaded
 
 
 def get_mapping() -> dict:
