@@ -214,9 +214,7 @@ class Converter:
         sas_paths = sorted(list(self.db_path.glob("*.sas7bdat")))
         conversion_results: set = set()
         threads = [
-            Converter.ConvertThread(
-                index, self, sas_path, conversion_results
-            )
+            Converter.ConvertThread(index, self, sas_path, conversion_results)
             for index, sas_path in enumerate(sas_paths)
         ]
         for thread in threads:
