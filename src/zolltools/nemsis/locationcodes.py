@@ -29,7 +29,6 @@ def get_mapping() -> dict:
     :returns: the location code mapping
     """
 
-    # TODO CLN: refactor `locationcodes` to avoid a global mapping variable
     global _MAPPING  # pylint: disable=global-statement
 
     log_prefix = "get_mapping"
