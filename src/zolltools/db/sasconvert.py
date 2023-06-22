@@ -107,8 +107,27 @@ class Converter:
 
         return parquet_path
 
+    def _validate_chunk(self, chunk) -> bool:
+        """
+        Determines whether two chunks (SAS and parquet) are equals
+
+        :param chunk: should contain the SAS and parquet chunks in the following
+        format: (SAS: pd.DataFrame, _), parquet: pyarrow.RecordBatch
+        :returns: whether the chunks are equal (bool)
+        """
+
+        (sas_frame, _), parquet_batch = chunk
+        parquet_frame = parquet_batch.to_pandas()
+        return sas_frame.equals(parquet_frame)
+
     def _validate_parquet_file(self, parquet_path: Path) -> bool:
-        """Returns whether the parquet file matches the corresponding SAS file"""
+        """
+        Returns whether the parquet file matches the corresponding SAS file
+
+        :param parquet_path: the parquet file to validate
+        :returns: (bool) whether the parquet file is a copy of the SAS file or
+        not
+        """
 
         log_prefix = "Converter._validate_parquet_file"
 
@@ -129,9 +148,8 @@ class Converter:
         results = set()
         start_time = time.perf_counter()
         combined_chunk_iterable = enumerate(zip(sas_iter, parquet_iter))
-        for index, ((sas_frame, _), parquet_batch) in combined_chunk_iterable:
-            parquet_frame = parquet_batch.to_pandas()
-            results.add(sas_frame.equals(parquet_frame))
+        for index, chunk in combined_chunk_iterable:
+            results.add(self._validate_chunk(chunk))
             end_time = time.perf_counter()
             logger.debug(
                 "%s.iteration: %d, %d", log_prefix, index, end_time - start_time
