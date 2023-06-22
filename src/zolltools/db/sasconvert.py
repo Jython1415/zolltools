@@ -191,7 +191,7 @@ class Converter:
         """
         Converts all SAS files in the input directory and deletes the original
         files. Returns the success of the entire conversion.
-        
+
         :returns: True if all conversions succeeded, False otherwise
         """
 
