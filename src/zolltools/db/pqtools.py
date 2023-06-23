@@ -4,6 +4,7 @@ import os
 import math
 import logging
 from pathlib import Path
+from typing import Tuple
 from types import GeneratorType
 
 import pandas as pd
@@ -84,7 +85,7 @@ class ParquetManager:
 
         return self.config.tmp_path if tmp else self.config.db_path
 
-    def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
+    def _get_parquet_file(self, pq_name: str, tmp=True) -> Tuple[pq.ParquetFile, Path]:
         """
         Returns the parquet file object and Path object given the name (w/o the
         file extension) of a parquet file.
@@ -194,7 +195,7 @@ class Reader(ParquetManager):
 
         return None
 
-    def get_table(self) -> pd.DataFrame:
+    def get_table(self, pq_name: str, tmp: bool) -> pd.DataFrame:
         """
         🚧 WIP 🚧 Gets a table (`pq_name`) from the database.
 
@@ -202,6 +203,9 @@ class Reader(ParquetManager):
         :param tmp: whether to get the table from temporary storage or from the
         data directory
         """
+
+        _ = pq_name
+        _ = tmp
 
         return pd.DataFrame()
 
