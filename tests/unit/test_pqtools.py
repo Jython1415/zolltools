@@ -14,8 +14,14 @@ from zolltools.db import pqtools
 
 
 @contextlib.contextmanager
-def temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
-    """Docstring"""
+def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
+    """
+    Context manager for a temporary parquet table (used for testing). The
+    context manager will delete the temporary directory and table upon closing.
+
+    :param frame: the data frame to make into a parquet table
+    :returns: the path to the temporary table
+    """
 
     table_id = str(pd.util.hash_pandas_object(frame).sum() % 1_000_000).zfill(6)
     temporary_directory = Path.cwd().joinpath(f"tmp_parquet_table_{table_id}")
@@ -32,17 +38,25 @@ def temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
 
 @pytest.fixture(scope="module")
 def tmp_table_3x3() -> Tuple[Path, pd.DataFrame]:
-    """docstring"""
+    """
+    Fixture of a temporary parquet table to use for tests.
+
+    :returns: (path to table, data frame that was stored as a parquet table)
+    """
 
     frame = pd.DataFrame(np.arange(1, 10).reshape(3, 3))
-    with temporary_parquet_table_context_manager(frame) as table_path:
+    with _temporary_parquet_table_context_manager(frame) as table_path:
         yield (table_path, frame)
 
 
 def test_get_table(
     tmp_table_3x3: Tuple[Path, pd.DataFrame]
 ):  # pylint: disable=redefined-outer-name
-    """docstring"""
+    """
+    Tests get_table with a simple table
+
+    :param tmp_table_3x3: a pytest fixture
+    """
 
     table_path, frame = tmp_table_3x3
     data_dir = table_path.parent
