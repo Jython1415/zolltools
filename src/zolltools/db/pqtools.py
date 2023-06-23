@@ -4,7 +4,7 @@ import os
 import math
 import logging
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 from types import GeneratorType
 
 import pandas as pd
@@ -195,13 +195,17 @@ class Reader(ParquetManager):
 
         return None
 
-    def get_table(self, pq_name: str, tmp: bool, columns=None) -> pd.DataFrame:
+    def get_table(
+        self, pq_name: str, tmp: bool, columns: Union[list[str], None] = None
+    ) -> pd.DataFrame:
         """
         Gets a table (`pq_name`) from the database.
 
         :param pq_name: the name (w/o file extension) of the file to read
         :param tmp: whether to get the table from temporary storage or from the
         data directory
+        :param columns: the columns to read from the table
+        :returns: a data frame representing the table that was read
         """
 
         pq_file, _ = self._get_parquet_file(pq_name, tmp)
