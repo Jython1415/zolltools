@@ -63,7 +63,7 @@ def test_get_table(
     data_dir = table_path.parent
     pq_config = pqtools.ParquetManager.Config(data_dir)
     pq_reader = pqtools.Reader(pq_config)
-    loaded_frame = pq_reader.get_table(  # pylint: disable=assignment-from-no-return
+    loaded_frame = pq_reader.get_table(
         table_path.name.removesuffix(".parquet"), tmp=False
     )
     pd.testing.assert_frame_equal(frame, loaded_frame)
