@@ -195,19 +195,19 @@ class Reader(ParquetManager):
 
         return None
 
-    def get_table(self, pq_name: str, tmp: bool) -> pd.DataFrame:
+    def get_table(self, pq_name: str, tmp: bool, columns=None) -> pd.DataFrame:
         """
-        🚧 WIP 🚧 Gets a table (`pq_name`) from the database.
+        Gets a table (`pq_name`) from the database.
 
         :param pq_name: the name (w/o file extension) of the file to read
         :param tmp: whether to get the table from temporary storage or from the
         data directory
         """
 
-        _ = pq_name
-        _ = tmp
+        pq_file, _ = self._get_parquet_file(pq_name, tmp)
+        table = pq_file.read(columns=columns, use_pandas_metadata=True)
 
-        return pd.DataFrame()
+        return table.to_pandas()
 
     def get_reader(
         self, pq_name: str, columns=None, target_in_memory_size=None, tmp=True
