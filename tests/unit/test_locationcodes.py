@@ -24,14 +24,14 @@ def test_get_mapping_performance():
     `min_exp_speedup` was determined with preliminary testing. See gh 74
     """
 
-    alpha = 0.05 # max p-value (exclusive)
+    alpha = 0.05  # max p-value (exclusive)
     min_exp_speedup = 10
-    num_data_points = 100 # see gh 74 for reasoning
+    num_data_points = 100  # see gh 74 for reasoning
     data = {"successive": [], "adjusted-first-read": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
         successive_read_lower_bound_incl = 100
-        successive_read_upper_bound_incl = 200 # see gh 74 for boundary reasoning
+        successive_read_upper_bound_incl = 200  # see gh 74 for boundary reasoning
 
         # Record the first read of the mapping
         start_time = time.perf_counter_ns()
@@ -43,7 +43,7 @@ def test_get_mapping_performance():
         nth_read_to_test = random.randint(
             successive_read_lower_bound_incl, successive_read_upper_bound_incl
         )
-        for _ in range(nth_read_to_test - 2): # -2, first read and the next (below)
+        for _ in range(nth_read_to_test - 2):  # -2, first read and the next (below)
             _ = locationcodes.get_mapping()
         start_time = time.perf_counter_ns()
         _ = locationcodes.get_mapping()

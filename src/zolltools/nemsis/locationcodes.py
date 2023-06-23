@@ -18,11 +18,7 @@ logger.addHandler(logging.NullHandler())
 STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXTENSION = ".json"
 
-
-class _MappingStorage:
-    """Class to store the location code mapping once it is loaded from storage."""
-
-    mapping = None
+_MAPPING = None  # Stores the mapping once it is loaded
 
 
 def get_mapping() -> dict:
@@ -33,17 +29,19 @@ def get_mapping() -> dict:
     :returns: the location code mapping
     """
 
+    global _MAPPING  # pylint: disable=global-statement
+
     log_prefix = "get_mapping"
 
     start_time = time.perf_counter_ns()
-    if _MappingStorage.mapping is not None:
-        return _MappingStorage.mapping
+    if _MAPPING is not None:
+        return _MAPPING
     root = resources.files(zolltools)
     mapping_file = root.joinpath("nemsis", "data", "location-code-mapping.pkl")
     logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
         mapping = pickle.load(file)
-        _MappingStorage.mapping = mapping
+        _MAPPING = mapping
         end_time = time.perf_counter_ns()
         logger.info(
             "%s: mapping read from %s in %d ns",
@@ -76,7 +74,7 @@ def to_description(code, default=None, mapping=None):
 
     if code == "7701001":
         return "Not Applicable"
-    elif code == "7701003":
+    if code == "7701003":
         return "Not Recorded"
 
     try:

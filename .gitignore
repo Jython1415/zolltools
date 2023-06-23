@@ -5,3 +5,6 @@
 **/tmp/**
 !.gitignore
 !.gitattributes
+
+# Track pre-commit config
+!.pre-commit-config.yaml
