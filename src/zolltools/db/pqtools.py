@@ -209,6 +209,8 @@ class Reader(ParquetManager):
         columns will be read
         :param target_in_memory_size: target size for each chunk (data frame) in
         memory
+        :param tmp: whether to get the table from temporary storage or from the
+        data directory
         """
 
         if target_in_memory_size is None:
