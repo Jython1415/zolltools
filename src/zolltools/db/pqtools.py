@@ -194,7 +194,7 @@ class Reader(ParquetManager):
 
         return None
 
-    def get_table(self, pq_name: str, tmp=True) -> pd.DataFrame:
+    def get_table(self) -> pd.DataFrame:
         """
         🚧 WIP 🚧 Gets a table (`pq_name`) from the database.
 
@@ -202,6 +202,8 @@ class Reader(ParquetManager):
         :param tmp: whether to get the table from temporary storage or from the
         data directory
         """
+
+        return pd.DataFrame()
 
     def get_reader(
         self, pq_name: str, columns=None, target_in_memory_size=None, tmp=True
