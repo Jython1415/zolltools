@@ -189,6 +189,11 @@ class Reader(ParquetManager):
         for batch in pq_iter:
             yield batch.to_pandas()
 
+    def get_metadata(self):
+        """Docstring"""
+
+        return None
+
     def get_table(self, pq_name: str, tmp=True) -> pd.DataFrame:
         """
         🚧 WIP 🚧 Gets a table (`pq_name`) from the database.
