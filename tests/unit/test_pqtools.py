@@ -1,6 +1,7 @@
 """Tests for pqtools.py"""
 
 import os
+import shutil
 import contextlib
 from pathlib import Path
 from typing import Tuple
@@ -33,8 +34,7 @@ def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
         yield table_path
     finally:
         os.remove(table_path)
-        temporary_directory.joinpath("tmp").rmdir()
-        temporary_directory.rmdir()
+        shutil.rmtree(temporary_directory)
 
 
 @pytest.fixture(scope="module")
