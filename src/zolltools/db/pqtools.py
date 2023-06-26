@@ -4,6 +4,7 @@ import os
 import math
 import logging
 from pathlib import Path
+from typing import Tuple, Union
 from types import GeneratorType
 
 import pandas as pd
@@ -84,7 +85,7 @@ class ParquetManager:
 
         return self.config.tmp_path if tmp else self.config.db_path
 
-    def _get_parquet_file(self, pq_name: str, tmp=True) -> tuple:
+    def _get_parquet_file(self, pq_name: str, tmp=True) -> Tuple[pq.ParquetFile, Path]:
         """
         Returns the parquet file object and Path object given the name (w/o the
         file extension) of a parquet file.
@@ -105,6 +106,35 @@ class ParquetManager:
         )
 
         return (pq.ParquetFile(file_path), file_path)
+
+    def _calc_row_size(self, pq_file: pq.ParquetFile) -> int:
+        """
+        Returns the size (in bytes) of a row of a parquet file when converted to
+        a pandas data frame. A single row of the parquet file (`pq_file`) is
+        read into memory for this calculation.
+
+        :param pq_file: the parquet file to read a row of.
+        :returns: the size of the row in memory as a row of a pandas data frame
+        """
+
+        pq_iter = pq_file.iter_batches(batch_size=1)
+        row = next(pq_iter).to_pandas()
+        return row.memory_usage(index=True, deep=True).sum()
+
+    def _calc_file_size(self, pq_file: pq.ParquetFile) -> int:
+        """
+        Returns the size (in bytes) of a parquet file in memory when it is
+        converted to a pandas data frame. Only a single row of the parquet file
+        is loaded into memory for this calculation.
+
+        :param pq_file: the parquet file to estimate the size of.
+        :returns: the estimated size of the parquet file in memory as a pandas
+        data frame
+        """
+
+        row_size = self._calc_row_size(pq_file)
+        num_rows = pq_file.metadata.num_rows
+        return row_size * num_rows
 
     def _calc_chunk_size(
         self, pq_name: str, tmp=True, target_in_memory_size=None
@@ -128,9 +158,7 @@ class ParquetManager:
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         pq_file, _ = self._get_parquet_file(pq_name, tmp=tmp)
-        pq_iter = pq_file.iter_batches(batch_size=1)
-        row = next(pq_iter).to_pandas()
-        size = row.memory_usage(index=True, deep=True).sum()
+        size = self._calc_row_size(pq_file)
         num_rows = math.floor(target_in_memory_size / size)
         logger.debug(
             "%s: calculated chunk size to be %d rows",
@@ -138,6 +166,18 @@ class ParquetManager:
             num_rows,
         )
         return num_rows
+
+    def get_columns(self, pq_name: str, tmp: bool = True) -> list[str]:
+        """
+        Returns the columns in a parquet table.
+
+        :param pq_name: the name of the table.
+        :param tmp: the directory the file is in.
+        :returns: the columns in the table.
+        """
+
+        pq_file, _ = self._get_parquet_file(pq_name, tmp)
+        return [column.name for column in pq_file.schema]
 
     def get_tables(self, tmp=True) -> list:
         """
@@ -189,14 +229,35 @@ class Reader(ParquetManager):
         for batch in pq_iter:
             yield batch.to_pandas()
 
-    def get_table(self, pq_name: str, tmp=True) -> pd.DataFrame:
+    def get_metadata(self):
+        """Docstring"""
+
+        return None
+
+    def get_table(
+        self, pq_name: str, tmp: bool, columns: Union[list[str], None] = None
+    ) -> pd.DataFrame:
         """
-        🚧 WIP 🚧 Gets a table (`pq_name`) from the database.
+        Gets a table (`pq_name`) from the database.
 
         :param pq_name: the name (w/o file extension) of the file to read
         :param tmp: whether to get the table from temporary storage or from the
         data directory
+        :param columns: the columns to read from the table
+        :returns: a data frame representing the table that was read
         """
+
+        pq_file, _ = self._get_parquet_file(pq_name, tmp)
+        estimated_file_size = self._calc_file_size(pq_file)
+        file_size_limit = self.config.default_target_in_memory_size
+        if estimated_file_size > file_size_limit:
+            raise MemoryError(
+                f"Estimated file size, {estimated_file_size}, is greater than "
+                f"the file size limit, {file_size_limit}."
+            )
+        table = pq_file.read(columns=columns, use_pandas_metadata=True)
+
+        return table.to_pandas()
 
     def get_reader(
         self, pq_name: str, columns=None, target_in_memory_size=None, tmp=True

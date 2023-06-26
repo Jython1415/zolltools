@@ -21,7 +21,7 @@ def test_removeprefix_empty_prefix(string: str):
 
 
 @pytest.mark.parametrize(
-    ("input", "prefix", "expected"),
+    ("string", "prefix", "expected"),
     [
         ("abcabcabc", "abc", "abcabc"),
         ("abc123456", "abc", "123456"),
@@ -35,7 +35,7 @@ def test_removeprefix_with_matching_prefix(string, prefix, expected):
 
 
 @pytest.mark.parametrize(
-    ("input", "prefix"),
+    ("string", "prefix"),
     [
         ("abcabcabc", "bac"),
         ("abc123456", "123"),
@@ -63,7 +63,7 @@ def test_removesuffix_empty_suffix(string: str):
 
 
 @pytest.mark.parametrize(
-    ("input", "suffix", "expected"),
+    ("string", "suffix", "expected"),
     [
         ("abcabcabc", "abc", "abcabc"),
         ("abc123456", "456", "abc123"),
@@ -77,7 +77,7 @@ def test_removesuffix_with_matching_suffix(string, suffix, expected):
 
 
 @pytest.mark.parametrize(
-    ("input", "suffix"),
+    ("string", "suffix"),
     [
         ("abcabcabc", "bac"),
         ("abc123456", "123"),
