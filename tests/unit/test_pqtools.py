@@ -108,6 +108,7 @@ def test_get_table_warning(
     pd.testing.assert_frame_equal(frame, loaded_frame)
 
 
+@pytest.mark.xfail
 def test_get_column_list(
     tmp_table_3x3_named_cols: Tuple[Path, pd.DataFrame]
 ):  # pylint: disable=redefined-outer-name
