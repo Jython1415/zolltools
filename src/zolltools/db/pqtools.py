@@ -168,7 +168,13 @@ class ParquetManager:
         return num_rows
 
     def get_columns(self, pq_name: str, tmp: bool = True) -> list[str]:
-        """docstring"""
+        """
+        Returns the columns in a parquet table.
+
+        :param pq_name: the name of the table.
+        :param tmp: the directory the file is in.
+        :returns: the columns in the table.
+        """
 
         pq_file, _ = self._get_parquet_file(pq_name, tmp)
         return [column.name for column in pq_file.schema]
