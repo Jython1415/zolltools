@@ -67,3 +67,18 @@ def test_get_table(
         table_path.name.removesuffix(".parquet"), tmp=False
     )
     pd.testing.assert_frame_equal(frame, loaded_frame)
+
+
+def test_get_table_warning(
+    tmp_table_3x3: Tuple[Path, pd.DataFrame]
+):  # pylint: disable=redefined-outer-name
+    """
+    Tests if get_table returns a warning when the requested table is too large
+    """
+
+    table_path, _ = tmp_table_3x3
+    data_dir = table_path.parent
+    pq_config = pqtools.ParquetManager.Config(data_dir, default_target_in_memory_size=1)
+    pq_reader = pqtools.Reader(pq_config)
+    with pytest.raises(MemoryError, match=""):
+        _ = pq_reader.get_table(table_path.name.removesuffix(".parquet"), tmp=False)
