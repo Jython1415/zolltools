@@ -108,7 +108,7 @@ def test_get_table_warning(
     pd.testing.assert_frame_equal(frame, loaded_frame)
 
 
-@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_get_column_list(
     tmp_table_3x3_named_cols: Tuple[Path, pd.DataFrame]
 ):  # pylint: disable=redefined-outer-name
@@ -118,4 +118,6 @@ def test_get_column_list(
     data_dir = table_path.parent
     pq_config = pqtools.ParquetManager.Config(data_dir)
     pq_reader = pqtools.Reader(pq_config)
-    assert frame.columns == pq_reader.get_columns()  # pylint: disable=no-member
+    assert list(frame.columns) == pq_reader.get_columns(
+        table_path.name.removesuffix(".parquet"), tmp=False
+    )  # pylint: disable=no-member

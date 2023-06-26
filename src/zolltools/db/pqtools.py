@@ -167,6 +167,12 @@ class ParquetManager:
         )
         return num_rows
 
+    def get_columns(self, pq_name: str, tmp: bool = True) -> list[str]:
+        """docstring"""
+
+        pq_file, _ = self._get_parquet_file(pq_name, tmp)
+        return [column.name for column in pq_file.schema]
+
     def get_tables(self, tmp=True) -> list:
         """
         Returns a list of the names of parquet tables in the database.
