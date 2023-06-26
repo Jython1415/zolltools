@@ -80,5 +80,5 @@ def test_get_table_warning(
     data_dir = table_path.parent
     pq_config = pqtools.ParquetManager.Config(data_dir, default_target_in_memory_size=1)
     pq_reader = pqtools.Reader(pq_config)
-    with pytest.raises(MemoryError, match=""):
+    with pytest.raises(MemoryError):
         _ = pq_reader.get_table(table_path.name.removesuffix(".parquet"), tmp=False)
