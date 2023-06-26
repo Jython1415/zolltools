@@ -40,12 +40,27 @@ def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
 @pytest.fixture(scope="module")
 def tmp_table_3x3() -> Tuple[Path, pd.DataFrame]:
     """
-    Fixture of a temporary parquet table to use for tests.
+    Fixture of a temporary parquet table to use for tests. The frame stored as a
+    parquet table was of the integers 1-9 arranged in a 3x3 grid.
 
     :returns: (path to table, data frame that was stored as a parquet table)
     """
 
     frame = pd.DataFrame(np.arange(1, 10).reshape(3, 3))
+    with _temporary_parquet_table_context_manager(frame) as table_path:
+        yield (table_path, frame)
+
+
+@pytest.fixture(scope="module")
+def tmp_table_3x3_named_cols() -> Tuple[Path, pd.DataFrame]:
+    """
+    Fixture for a temporary parquet table to use for tests.The frame stored as a
+    parquet table was of the integers 1-9 arranged in a 3x3 grid with column
+    names "a", "b", and "c".
+
+    :returns: (path to table, data frame that was stored as a parquet table)"""
+
+    frame = pd.DataFrame(np.arange(1, 10).reshape(3, 3), columns=["a", "b", "c"])
     with _temporary_parquet_table_context_manager(frame) as table_path:
         yield (table_path, frame)
 
@@ -91,3 +106,15 @@ def test_get_table_warning(
         table_path.name.removesuffix(".parquet"), tmp=False
     )
     pd.testing.assert_frame_equal(frame, loaded_frame)
+
+
+def test_get_column_list(
+    tmp_table_3x3_named_cols: Tuple[Path, pd.DataFrame]
+):  # pylint: disable=redefined-outer-name
+    """docstring"""
+
+    table_path, frame = tmp_table_3x3_named_cols
+    data_dir = table_path.parent
+    pq_config = pqtools.ParquetManager.Config(data_dir)
+    pq_reader = pqtools.Reader(pq_config)
+    assert frame.columns == pq_reader.get_columns()  # pylint: disable=no-member
