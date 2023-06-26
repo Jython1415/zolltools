@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import random
 import contextlib
 from pathlib import Path
 from typing import Tuple
@@ -24,7 +25,10 @@ def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
     :returns: the path to the temporary table
     """
 
-    table_id = str(pd.util.hash_pandas_object(frame).sum() % 1_000_000).zfill(6)
+    randomizer = random.randint(1, 100_000)
+    table_id = str(
+        (pd.util.hash_pandas_object(frame).sum() % 900_000) + randomizer
+    ).zfill(6)
     temporary_directory = Path.cwd().joinpath(f"tmp_parquet_table_{table_id}")
     temporary_directory.mkdir(exist_ok=True)
     table = pa.Table.from_pandas(frame)
