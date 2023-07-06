@@ -337,5 +337,5 @@ def test_get_code_set_correctness():
         ]
     )
 
-    result = locationcodes.get_code_set()  # pylint: disable=no-member
+    result = locationcodes.get_code_set()
     assert result == expected
