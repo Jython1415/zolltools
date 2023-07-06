@@ -19,6 +19,7 @@ STORAGE_FOLDER_NAME = "location-codes-groupings"
 STORAGE_FOLDER_EXTENSION = ".json"
 
 _MAPPING = None  # Stores the mapping once it is loaded
+_CODE_SET = None  # Stores the set of codes once it is loaded
 
 
 def get_mapping() -> dict:
@@ -50,6 +51,37 @@ def get_mapping() -> dict:
             end_time - start_time,
         )
         return mapping
+
+
+def get_code_set() -> set[str]:
+    """
+    Returns a set containing all location codes. The first read will load the
+    set from storage.
+
+    :returns: a set containing all the location codes
+    """
+
+    global _CODE_SET  # pylint: disable=global-statement
+
+    log_prefix = "get_code_set"
+
+    start_time = time.perf_counter_ns()
+    if _CODE_SET is not None:
+        return _CODE_SET
+    root = resources.files(zolltools)
+    set_file = root.joinpath("nemsis", "data", "location-code-set.pkl")
+    logger.debug("%s: identified code file: %s", log_prefix, repr(set_file))
+    with set_file.open("rb") as file:
+        code_set = pickle.load(file)
+        _CODE_SET = code_set
+        end_time = time.perf_counter_ns()
+        logger.info(
+            "%s: code set read from %s in %d ns",
+            log_prefix,
+            set_file,
+            end_time - start_time,
+        )
+        return code_set
 
 
 def to_description(code, default=None, mapping=None):
