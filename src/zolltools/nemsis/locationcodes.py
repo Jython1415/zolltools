@@ -15,7 +15,7 @@ from zolltools import strtools
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-STORAGE_FOLDER_NAME = "location-codes-groupings"
+STORAGE_FOLDER_NAME = "location-code-categorizations"
 STORAGE_FOLDER_EXTENSION = ".json"
 
 _MAPPING = None  # Stores the mapping once it is loaded
@@ -52,7 +52,7 @@ def get_mapping() -> dict:
         return mapping
 
 
-def to_description(code, default=None, mapping=None):
+def to_description(code, default=None, mapping=None) -> str:
     """
     Returns the description for the provided code
 
@@ -94,50 +94,55 @@ def to_description(code, default=None, mapping=None):
 
 
 def _get_storage_dir() -> Path:
-    """Return a Path pointing to the directory holding the groupings"""
+    """Return a Path pointing to the directory holding the categorizations"""
 
     storage_dir_path = Path.cwd().joinpath(STORAGE_FOLDER_NAME)
     return storage_dir_path
 
 
-def get_grouping(name: str) -> dict:
+def get_categorization(name: str) -> dict:
     """
-    Returns a grouping of location codes.
+    Returns a categorization of location codes.
 
-    :param name: the name of the grouping to retrieve.
-    :returns: a dict representing the grouping
-    :raises FileNotFoundError: when there is no grouping corresponding to `name`
+    :param name: the name of the categorization to retrieve.
+    :returns: a dict representing the categorization
+    :raises FileNotFoundError: when there is no categorization corresponding to
+    `name`
     """
 
-    log_prefix = "get_grouping"
+    log_prefix = "get_categorization"
 
     storage_dir = _get_storage_dir()
-    grouping_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXTENSION}")
-    logger.debug("%s: file path identified as %s", log_prefix, grouping_path)
+    categorization_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXTENSION}")
+    logger.debug("%s: file path identified as %s", log_prefix, categorization_path)
 
-    if not grouping_path.exists():
+    if not categorization_path.exists():
         logger.error(
-            "%s: grouping file (%s) could not be found", log_prefix, grouping_path
+            "%s: categorization file (%s) could not be found",
+            log_prefix,
+            categorization_path,
         )
         raise FileNotFoundError(
-            f'"{name}" cannot be found. {grouping_path} does not exist.'
+            f'"{name}" cannot be found. {categorization_path} does not exist.'
         )
 
     try:
-        with open(grouping_path, "rb") as grouping_file:
-            logger.debug("%s: grouping file successfully opened", log_prefix)
-            grouping = json.load(grouping_file)
-            logger.debug("%s: grouping read from file", log_prefix)
-            return grouping
+        with open(categorization_path, "rb") as categorization_file:
+            logger.debug("%s: categorization file successfully opened", log_prefix)
+            categorization = json.load(categorization_file)
+            logger.debug("%s: categorization read from file", log_prefix)
+            return categorization
     except OSError as error:
         logger.error(
-            "%s: grouping file (%s) could not be accessed", log_prefix, grouping_path
+            "%s: categorization file (%s) could not be accessed",
+            log_prefix,
+            categorization_path,
         )
         raise OSError(f"{name} could not be accessed") from error
 
 
-def _list():
-    """Lists location code groupings"""
+def _list() -> None:
+    """Lists location code categorizations"""
 
     storage_dir = _get_storage_dir()
     paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXTENSION}")
@@ -145,28 +150,33 @@ def _list():
         [strtools.removesuffix(path.name, STORAGE_FOLDER_EXTENSION) for path in paths]
     )
     logger.debug(
-        "_list: %d groupings identified in %s: %s", len(names), storage_dir, str(names)
+        "_list: %d categorizations identified in %s: %s",
+        len(names),
+        storage_dir,
+        str(names),
     )
 
     print("\n".join(names))
 
 
-def _validate():
-    """Validates a location code grouping"""
+def _validate() -> None:
+    """Validates a location code categorization"""
 
     print("This command is still WIP...")
 
 
-def _init():
-    """Initializes a folder for location code groupings"""
+def _init() -> None:
+    """Initializes a folder for location code categorizations"""
 
     storage_dir = _get_storage_dir()
     storage_dir.mkdir(exist_ok=True)
 
-    print(f"Store location code groupings in {STORAGE_FOLDER_NAME}\n> {storage_dir}")
+    print(
+        f"Store location code categorizations in {STORAGE_FOLDER_NAME}\n> {storage_dir}"
+    )
 
 
-def _main():
+def _main() -> None:
     """Method that defines the logic of the module when executed."""
 
     parser = argparse.ArgumentParser(description="module description")
