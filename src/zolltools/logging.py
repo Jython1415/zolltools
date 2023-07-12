@@ -21,7 +21,7 @@ def add_handler(
     clear=False,  # pylint: disable=unused-argument
 ) -> list[logging.Logger]:
     """
-    Adds `handler` to a logger (or all loggers) in the zolltools package.
+    Adds `handler` to loggers in the zolltools package.
 
     :param handler: the handler to add to the logger(s).
     :param logger_names: leave as `None` to apply the handler to all zolltools
@@ -31,7 +31,8 @@ def add_handler(
     :param clear: set to `True` to clear all other handlers from the logger(s)
     before adding `handler`.
     :returns: a list of the loggers the handler was applied to.
-    :raises ValueError: if the logger specified by `logger` cannot be found.
+    :raises ValueError: if a logger specified by `logger_names` does not exist
+    in the package.
     """
 
     log_prefix = "add_handler"
@@ -66,3 +67,23 @@ def add_handler(
         result_logger.addHandler(handler)
         result.append(result_logger)
     return result
+
+
+def set_level(
+    level: Union[int, str],  # pylint: disable=unused-argument
+    logger_names: Union[  # pylint: disable=unused-argument
+        Iterable[str], str, None
+    ] = None,
+) -> list[logging.Logger]:
+    """
+    Sets the logging level for loggers in the zolltools package.
+
+    :param level: the level to assign to the loggers
+    :param logger_names: `None` to set all loggers. Provide a list of names (or
+    just a single name) to set the level of only those loggers.
+    :returns: a list of the loggers the level was assigned to.
+    :raises ValueError: if a logger specified by `logger_names` does not exist
+    in the package.
+    """
+
+    return []
