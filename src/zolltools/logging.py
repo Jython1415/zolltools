@@ -3,6 +3,14 @@
 import logging
 from typing import Union
 
+_LOGGERS: list[str] = [
+    "zolltools.db.pqtools",
+    "zolltools.db.sasconvert",
+    "zolltools.nemsis.locationcodes",
+    "zolltools.logging",
+    "zolltools.strtools",
+]
+
 
 def add_handler(
     handler: logging.Handler,  # pylint: disable=unused-argument
