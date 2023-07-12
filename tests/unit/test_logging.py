@@ -39,7 +39,7 @@ def test_add_handler_specific(logger_name) -> None:
 
 @hp.given(logger_name=st.text())
 def test_add_handler_exception(logger_name) -> None:
-    """Tests the add_handler when the logger request does not exist"""
+    """Tests the add_handler when the logger requested does not exist"""
 
     hp.assume(logger_name not in zoll_logging.LOGGERS)
     with pytest.raises(ValueError):
