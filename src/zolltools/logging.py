@@ -3,7 +3,7 @@
 import logging
 from typing import Union
 
-_LOGGERS: list[str] = [
+LOGGERS: list[str] = [
     "zolltools.db.pqtools",
     "zolltools.db.sasconvert",
     "zolltools.nemsis.locationcodes",
