@@ -24,13 +24,13 @@ def test_add_handler_all() -> None:
     assert len(set(expected_loggers).difference(result_logger_names)) == 0
 
 
-@pytest.mark.parametrize(("logger_name"), [zoll_logging.LOGGERS])
+@pytest.mark.parametrize(("logger_name"), zoll_logging.LOGGERS)
 def test_add_handler_specific(logger_name) -> None:
     """Tests the add_handler function when adding a handler to a specific logger"""
 
     handler = logging.NullHandler()
     result_logger: logging.Logger = zoll_logging.add_handler(
-        handler, logger=logger_name
+        handler, logger_name=logger_name
     )[0]
     assert isinstance(result_logger, logging.Logger)
     assert result_logger.name == logger_name
@@ -43,4 +43,4 @@ def test_add_handler_exception(logger_name) -> None:
 
     hp.assume(logger_name not in zoll_logging.LOGGERS)
     with pytest.raises(ValueError):
-        zoll_logging.add_handler(logging.NullHandler(), logger=logger_name)
+        zoll_logging.add_handler(logging.NullHandler(), logger_name=logger_name)
