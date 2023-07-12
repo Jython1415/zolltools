@@ -39,9 +39,11 @@ def add_handler(
     logger_names_is_invalid_str = (
         isinstance(logger_names, str) and logger_names not in LOGGERS
     )
-    logger_names_contains_invalid_str = isinstance(logger_names, Iterable) and not set(
-        logger_names
-    ).issubset(LOGGERS)
+    logger_names_contains_invalid_str = (
+        not isinstance(logger_names, str)
+        and isinstance(logger_names, Iterable)
+        and not set(logger_names).issubset(LOGGERS)
+    )
     if logger_names_is_invalid_str or logger_names_contains_invalid_str:
         if isinstance(logger_names, str):
             logger_names = [logger_names]
