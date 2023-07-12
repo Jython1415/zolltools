@@ -16,10 +16,8 @@ logger.addHandler(logging.NullHandler())
 
 
 def add_handler(
-    handler: logging.Handler,  # pylint: disable=unused-argument
-    logger_names: Union[
-        Iterable[str], str, None
-    ] = None,  # pylint: disable=unused-argument
+    handler: logging.Handler,
+    logger_names: Union[Iterable[str], str, None] = None,
     clear=False,  # pylint: disable=unused-argument
 ) -> list[logging.Logger]:
     """
