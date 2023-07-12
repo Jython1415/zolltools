@@ -21,7 +21,7 @@ def test_add_handler_all() -> None:
         assert logger.name in expected_loggers
         assert handler in logger.handlers
     result_logger_names: set[str] = {logger.name for logger in result_loggers}
-    assert len(result_logger_names.difference(expected_loggers)) == 0
+    assert len(set(expected_loggers).difference(result_logger_names)) == 0
 
 
 @pytest.mark.parametrize(("logger_name"), [zoll_logging.LOGGERS])
