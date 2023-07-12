@@ -1,9 +1,9 @@
 {
     "name": "suggested",
-    "grouping": [
+    "categories": [
         {
             "id": 0,
-            "groupName": "commercial",
+            "name": "commercial",
             "codes": [
                 "Y92.520",
                 "Y92.39",
@@ -17,7 +17,7 @@
         },
         {
             "id": 1,
-            "groupName": "healthcare",
+            "name": "healthcare",
             "codes": [
                 "Y92.531",
                 "Y92.23",
@@ -29,7 +29,7 @@
         },
         {
             "id": 3,
-            "groupName": "Institutional Residence",
+            "name": "institutional_residence",
             "codes": [
                 "Y92.1",
                 "Y92.14",
@@ -39,7 +39,7 @@
         },
         {
             "id": 4,
-            "groupName": "Other",
+            "name": "other",
             "codes": [
                 "Y92.89",
                 "Y92.13",
@@ -50,7 +50,7 @@
         },
         {
             "id": 5,
-            "groupName": "Private Residence",
+            "name": "private_residence",
             "codes": [
                 "Y92.03",
                 "Y92.02",
@@ -63,7 +63,7 @@
         },
         {
             "id": 6,
-            "groupName": "Recreational",
+            "name": "recreational",
             "codes": [
                 "Y92.29",
                 "Y92.830",
@@ -74,7 +74,7 @@
         },
         {
             "id": 7,
-            "groupName": "School",
+            "name": "school",
             "codes": [
                 "Y92.210",
                 "Y92.21",
@@ -84,7 +84,7 @@
         },
         {
             "id": 8,
-            "groupName": "Street/Road",
+            "name": "street_or_road",
             "codes": [
                 "Y92.481",
                 "Y92.480",
@@ -96,7 +96,7 @@
         },
         {
             "id": 2,
-            "groupName": "NOT values",
+            "name": "not_value",
             "codes": [
                 "7701001",
                 "7701003"
