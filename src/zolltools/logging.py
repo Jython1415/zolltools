@@ -14,7 +14,7 @@ LOGGERS: list[str] = [
 
 def add_handler(
     handler: logging.Handler,  # pylint: disable=unused-argument
-    logger: Union[None, str] = None,  # pylint: disable=unused-argument
+    logger_name: Union[None, str] = None,  # pylint: disable=unused-argument
     clear=False,  # pylint: disable=unused-argument
 ) -> list[logging.Logger]:
     """
@@ -30,4 +30,16 @@ def add_handler(
     :raises ValueError: if the logger specified by `logger` cannot be found.
     """
 
-    return []
+    if logger_name is None:
+        logger_names = LOGGERS
+    elif logger_name in LOGGERS:
+        logger_names = [logger_name]
+    else:
+        raise ValueError(f"{logger_name} is not a valid logger:\n\t{LOGGERS}")
+
+    result = []
+    for name in logger_names:
+        logger = logging.getLogger(name)
+        logger.addHandler(handler)
+        result.append(logger)
+    return result
