@@ -21,3 +21,5 @@ def add_handler(
     :returns: a list of the loggers the handler was applied to.
     :raises ValueError: if the logger specified by `logger` cannot be found.
     """
+
+    return []
