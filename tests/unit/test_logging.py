@@ -30,11 +30,26 @@ def test_add_handler_specific(logger_name) -> None:
 
     handler = logging.NullHandler()
     result_logger: logging.Logger = zoll_logging.add_handler(
-        handler, logger_name=logger_name
+        handler, logger_names=logger_name
     )[0]
     assert isinstance(result_logger, logging.Logger)
     assert result_logger.name == logger_name
     assert handler in result_logger.handlers
+
+
+@hp.given(logger_names=st.sets(st.sampled_from(zoll_logging.LOGGERS), min_size=1))
+def test_add_handler_list(logger_names):
+    """Tests the add_handler function when adding a handler to a list of loggers"""
+
+    handler = logging.NullHandler()
+    result_loggers = zoll_logging.add_handler(handler, logger_names=logger_names)
+    assert isinstance(result_loggers, list)
+    for logger in result_loggers:
+        assert isinstance(logger, logging.Logger)
+        assert logger.name in logger_names
+        assert handler in logger.handlers
+    result_logger_names: set[str] = {logger.name for logger in result_loggers}
+    assert len(set(logger_names).difference(result_logger_names)) == 0
 
 
 @hp.given(logger_name=st.text())
@@ -43,4 +58,4 @@ def test_add_handler_exception(logger_name) -> None:
 
     hp.assume(logger_name not in zoll_logging.LOGGERS)
     with pytest.raises(ValueError):
-        zoll_logging.add_handler(logging.NullHandler(), logger_name=logger_name)
+        zoll_logging.add_handler(logging.NullHandler(), logger_names=logger_name)
