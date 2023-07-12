@@ -11,6 +11,9 @@ LOGGERS: list[str] = [
     "zolltools.strtools",
 ]
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
 
 def add_handler(
     handler: logging.Handler,  # pylint: disable=unused-argument
@@ -35,11 +38,12 @@ def add_handler(
     elif logger_name in LOGGERS:
         logger_names = [logger_name]
     else:
+        logger.error("add_handler: %s is not a valid logger", logger_name)
         raise ValueError(f"{logger_name} is not a valid logger:\n\t{LOGGERS}")
 
     result = []
     for name in logger_names:
-        logger = logging.getLogger(name)
-        logger.addHandler(handler)
-        result.append(logger)
+        result_logger = logging.getLogger(name)
+        result_logger.addHandler(handler)
+        result.append(result_logger)
     return result
