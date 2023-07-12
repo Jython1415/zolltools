@@ -34,6 +34,8 @@ def add_handler(
     :raises ValueError: if the logger specified by `logger` cannot be found.
     """
 
+    log_prefix = "add_handler"
+
     logger_names_is_invalid_str: bool = (
         isinstance(logger_names, str) and logger_names not in LOGGERS
     )
@@ -46,15 +48,17 @@ def add_handler(
         if isinstance(logger_names, str):
             logger_names = [logger_names]
         invalid_logger_names: set[str] = set(logger_names).difference(LOGGERS)
-        logger.error("add_handler: %s are not a valid loggers", invalid_logger_names)
+        logger.error("%s: %s are not a valid loggers", log_prefix, invalid_logger_names)
         raise ValueError(
             f"{invalid_logger_names} are not a valid loggers:\n\t{LOGGERS}"
         )
 
     if logger_names is None:
         logger_names = LOGGERS
+        logger.debug("%s: selected all loggers", log_prefix)
     elif isinstance(logger_names, str):
         logger_names = [logger_names]
+        logger.debug("%s: selected single logger: %s", log_prefix, logger_names[0])
 
     result = []
     for name in logger_names:
