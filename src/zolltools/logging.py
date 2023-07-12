@@ -38,7 +38,7 @@ def add_handler(
 
     if logger_names is None:
         logger_names = LOGGERS
-    elif isinstance(logger_names, str):
+    elif isinstance(logger_names, str) and logger_names in LOGGERS:
         logger_names = [logger_names]
     elif not set(logger_names).issubset(LOGGERS):
         invalid_logger_names = set(logger_names).difference(LOGGERS)
