@@ -34,10 +34,10 @@ def add_handler(
     :raises ValueError: if the logger specified by `logger` cannot be found.
     """
 
-    logger_names_is_invalid_str = (
+    logger_names_is_invalid_str: bool = (
         isinstance(logger_names, str) and logger_names not in LOGGERS
     )
-    logger_names_contains_invalid_str = (
+    logger_names_contains_invalid_str: bool = (
         not isinstance(logger_names, str)
         and isinstance(logger_names, Iterable)
         and not set(logger_names).issubset(LOGGERS)
