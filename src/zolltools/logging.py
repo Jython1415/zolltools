@@ -1,7 +1,7 @@
 """Convenience module for configuring logging for the zolltools package"""
 
 import logging
-from typing import Union
+from typing import Union, Iterable
 
 LOGGERS: list[str] = [
     "zolltools.db.pqtools",
@@ -17,29 +17,33 @@ logger.addHandler(logging.NullHandler())
 
 def add_handler(
     handler: logging.Handler,  # pylint: disable=unused-argument
-    logger_name: Union[None, str] = None,  # pylint: disable=unused-argument
+    logger_names: Union[
+        Iterable[str], str, None
+    ] = None,  # pylint: disable=unused-argument
     clear=False,  # pylint: disable=unused-argument
 ) -> list[logging.Logger]:
     """
     Adds `handler` to a logger (or all loggers) in the zolltools package.
 
     :param handler: the handler to add to the logger(s).
-    :param logger: leave as `None` to apply the handler to all zolltools
+    :param logger_names: leave as `None` to apply the handler to all zolltools
     loggers. Set to a logger name (e.g. "zolltools.nemsis.locationcodes") to
-    select that particular logger.
+    select that particular logger. Set to a list of logger names to apply to all
+    those loggers.
     :param clear: set to `True` to clear all other handlers from the logger(s)
     before adding `handler`.
     :returns: a list of the loggers the handler was applied to.
     :raises ValueError: if the logger specified by `logger` cannot be found.
     """
 
-    if logger_name is None:
+    if logger_names is None:
         logger_names = LOGGERS
-    elif logger_name in LOGGERS:
-        logger_names = [logger_name]
-    else:
-        logger.error("add_handler: %s is not a valid logger", logger_name)
-        raise ValueError(f"{logger_name} is not a valid logger:\n\t{LOGGERS}")
+    elif not set(logger_names).issubset(LOGGERS):
+        invalid_logger_names = set(logger_names).difference(LOGGERS)
+        logger.error("add_handler: %s is not a valid logger", str(invalid_logger_names))
+        raise ValueError(
+            f"{invalid_logger_names} are not a valid loggers:\n\t{LOGGERS}"
+        )
 
     result = []
     for name in logger_names:
