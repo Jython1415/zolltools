@@ -51,7 +51,7 @@ def _get_loggers(logger_names: Union[Iterable[str], str, None]) -> list[logging.
 def add_handler(
     handler: logging.Handler,
     logger_names: Union[Iterable[str], str, None] = None,
-    clear=False,  # pylint: disable=unused-argument
+    clear=False,
 ) -> list[logging.Logger]:
     """
     Adds `handler` to loggers in the zolltools package.
