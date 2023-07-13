@@ -69,6 +69,32 @@ def test_add_handler_exception(logger_name) -> None:
         zoll_logging.add_handler(logging.NullHandler(), logger_names=logger_name)
 
 
+@hp.given(logger_name=st.sampled_from(zoll_logging.LOGGERS))
+def test_add_handler_clear_option(logger_name) -> None:
+    """
+    Tests the clear parameter for the add_handler function
+    """
+
+    handler1 = logging.NullHandler()
+    handler2 = logging.NullHandler()
+    handler3 = logging.NullHandler()
+
+    result_loggers = zoll_logging.add_handler(handler1, logger_names=logger_name)
+    assert isinstance(result_loggers, list)
+    assert len(result_loggers) == 1
+    result_logger: logging.Logger = result_loggers[0]
+    assert handler1 in result_logger.handlers
+    result_loggers = zoll_logging.add_handler(handler2, logger_names=logger_name)
+    assert handler1 in result_logger.handlers
+    assert handler2 in result_logger.handlers
+    result_loggers = zoll_logging.add_handler(
+        handler3, logger_names=logger_name, clear=True
+    )
+    assert handler1 not in result_logger.handlers
+    assert handler2 not in result_logger.handlers
+    assert handler3 in result_logger.handlers
+
+
 @hp.given(
     expected_level=st.one_of(
         st.sampled_from(
