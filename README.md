@@ -19,3 +19,17 @@ sasconvert_logger = logging.getLogger("zolltools.db.sasconvert")
 sasconvert_logger.setLevel(logging.DEBUG)
 sasconvert_logger.addHandler(logging.FileHandler("sasconvert.log"))
 ```
+
+To add a handler or set the level of all loggers in the package at once (and for
+other similar convenience functions), see the `zolltools.logging` module. See
+the example usage below.
+
+```Python
+import logging
+from zolltools import logging as zlog
+
+zoll_handler = logging.FileHandler("main.log")
+zoll_level = logging.WARNING
+zlog.set_level(zoll_level)
+zlog.add_handler(zoll_handler)
+```
