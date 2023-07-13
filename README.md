@@ -26,10 +26,10 @@ the example usage below.
 
 ```Python
 import logging
-from zolltools import logging as zlog
+from zolltools import logging as zlg
 
 zoll_handler = logging.FileHandler("main.log")
 zoll_level = logging.WARNING
-zlog.set_level(zoll_level)
-zlog.add_handler(zoll_handler)
+zlg.set_level(zoll_level)
+zlg.add_handler(zoll_handler)
 ```
