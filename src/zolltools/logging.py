@@ -70,6 +70,8 @@ def add_handler(
 
     loggers = _get_loggers(logger_names)
     for module_logger in loggers:
+        if clear:
+            module_logger.handlers.clear()
         module_logger.addHandler(handler)
     return loggers
 
