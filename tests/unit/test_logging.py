@@ -1,4 +1,4 @@
-"""Tests for locationcodes.py"""
+"""Tests for logging.py"""
 
 import logging
 
@@ -26,7 +26,7 @@ def test_add_handler_all() -> None:
     assert len(set(expected_loggers).difference(result_logger_names)) == 0
 
 
-@pytest.mark.parametrize(("logger_name"), zoll_logging.LOGGERS)
+@hp.given(logger_name=st.sampled_from(zoll_logging.LOGGERS))
 def test_add_handler_specific(logger_name) -> None:
     """
     Tests the add_handler function when adding a handler to a specific logger

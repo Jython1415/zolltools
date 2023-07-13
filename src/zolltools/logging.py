@@ -8,7 +8,6 @@ LOGGERS: list[str] = [
     "zolltools.db.sasconvert",
     "zolltools.nemsis.locationcodes",
     "zolltools.logging",
-    "zolltools.strtools",
 ]
 
 logger = logging.getLogger(__name__)
