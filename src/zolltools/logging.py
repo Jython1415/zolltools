@@ -15,6 +15,39 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
+def _get_loggers(logger_names: Union[Iterable[str], str, None]) -> list[logging.Logger]:
+    """
+    Returns the loggers associated with the names provided.
+
+    :param logger_names: `None` for all loggers in the package. Provide a list
+    of names or a single name of a module for which the logger is required
+    otherwise.
+    :returns: a list of the loggers requested.
+    :raises ValueError: if any of the names provided are not valid modules.
+    """
+
+    logger_names_is_invalid_str: bool = (
+        isinstance(logger_names, str) and logger_names not in LOGGERS
+    )
+    logger_names_contains_invalid_str: bool = (
+        not isinstance(logger_names, str)
+        and isinstance(logger_names, Iterable)
+        and not set(logger_names).issubset(LOGGERS)
+    )
+    if logger_names_is_invalid_str or logger_names_contains_invalid_str:
+        if isinstance(logger_names, str):
+            logger_names = [logger_names]
+        invalid_logger_names: set[str] = set(logger_names).difference(LOGGERS)
+        raise ValueError(f"{invalid_logger_names} are not valid loggers:\n\t{LOGGERS}")
+
+    if logger_names is None:
+        logger_names = LOGGERS
+    elif isinstance(logger_names, str):
+        logger_names = [logger_names]
+
+    return [logging.getLogger(name) for name in logger_names]
+
+
 def add_handler(
     handler: logging.Handler,
     logger_names: Union[Iterable[str], str, None] = None,
@@ -35,38 +68,10 @@ def add_handler(
     in the package.
     """
 
-    log_prefix = "add_handler"
-
-    logger_names_is_invalid_str: bool = (
-        isinstance(logger_names, str) and logger_names not in LOGGERS
-    )
-    logger_names_contains_invalid_str: bool = (
-        not isinstance(logger_names, str)
-        and isinstance(logger_names, Iterable)
-        and not set(logger_names).issubset(LOGGERS)
-    )
-    if logger_names_is_invalid_str or logger_names_contains_invalid_str:
-        if isinstance(logger_names, str):
-            logger_names = [logger_names]
-        invalid_logger_names: set[str] = set(logger_names).difference(LOGGERS)
-        logger.error("%s: %s are not a valid loggers", log_prefix, invalid_logger_names)
-        raise ValueError(
-            f"{invalid_logger_names} are not a valid loggers:\n\t{LOGGERS}"
-        )
-
-    if logger_names is None:
-        logger_names = LOGGERS
-        logger.debug("%s: selected all loggers", log_prefix)
-    elif isinstance(logger_names, str):
-        logger_names = [logger_names]
-        logger.debug("%s: selected single logger: %s", log_prefix, logger_names[0])
-
-    result = []
-    for name in logger_names:
-        result_logger = logging.getLogger(name)
-        result_logger.addHandler(handler)
-        result.append(result_logger)
-    return result
+    loggers = _get_loggers(logger_names)
+    for module_logger in loggers:
+        module_logger.addHandler(handler)
+    return loggers
 
 
 def set_level(
@@ -86,4 +91,7 @@ def set_level(
     in the package.
     """
 
-    return []
+    loggers = _get_loggers(logger_names)
+    for module_logger in loggers:
+        module_logger.setLevel(level)
+    return loggers
