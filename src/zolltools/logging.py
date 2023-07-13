@@ -77,10 +77,8 @@ def add_handler(
 
 
 def set_level(
-    level: Union[int, str],  # pylint: disable=unused-argument
-    logger_names: Union[  # pylint: disable=unused-argument
-        Iterable[str], str, None
-    ] = None,
+    level: Union[int, str],
+    logger_names: Union[Iterable[str], str, None] = None,
 ) -> list[logging.Logger]:
     """
     Sets the logging level for loggers in the zolltools package.
