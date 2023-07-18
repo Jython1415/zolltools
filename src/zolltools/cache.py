@@ -17,7 +17,7 @@ def load(  # pylint: disable=too-many-arguments
     generate: Callable[[State], T],
     unique_id: int,
     reload: Optional[Callable[[State, State], bool]] = None,
-    folder=Path.cwd().joinpath("tmp"),
+    folder: Path = Path.cwd().joinpath("tmp"),
     force_update=False,
 ) -> T:
     """
