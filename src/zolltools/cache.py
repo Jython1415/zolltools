@@ -15,8 +15,8 @@ StorageObject = NamedTuple("StorageObject", [("state", State), ("stored_object",
 def load(  # pylint: disable=too-many-arguments
     state: State,
     generate: Callable[[State], T],
+    unique_id: int,
     reload: Optional[Callable[[State, State], bool]] = None,
-    unique_id: Optional[int] = None,
     folder=Path.cwd().joinpath("tmp"),
     force_update=False,
 ) -> T:
@@ -27,10 +27,6 @@ def load(  # pylint: disable=too-many-arguments
     if reload is None:
         reload = _default_state_comparison
     assert reload is not None
-
-    if unique_id is None:
-        unique_id = _generate_unique_id()
-    assert unique_id is not None
 
     file_path = folder.joinpath(f"{unique_id}.pkl")
     if not file_path.exists() or force_update:
@@ -48,10 +44,6 @@ def load(  # pylint: disable=too-many-arguments
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:
     return prev_state == state
-
-
-def _generate_unique_id() -> str:
-    return ""
 
 
 def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> T:
