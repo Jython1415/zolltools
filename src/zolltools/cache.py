@@ -15,8 +15,8 @@ StorageObject = NamedTuple("StorageObject", [("state", State), ("stored_object",
 def load(  # pylint: disable=too-many-arguments
     state: State,
     generate: Callable[[State], T],
-    reload: Optional[Callable[[State, State], bool]],
-    unique_id: Optional[int],
+    reload: Optional[Callable[[State, State], bool]] = None,
+    unique_id: Optional[int] = None,
     folder=Path.cwd().joinpath("tmp"),
     force_update=False,
 ) -> T:
