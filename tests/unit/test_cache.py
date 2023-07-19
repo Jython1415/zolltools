@@ -77,7 +77,7 @@ def test_load_state_usage(state) -> None:
 
 
 @hp.given(initial_state=st.integers())
-def test_meaningful_generate_parameter(initial_state) -> None:
+def test_load_meaningful_generate_parameter(initial_state) -> None:
     """
     Tests the load function with a generate function that actually performs a
     computation.
@@ -90,3 +90,30 @@ def test_meaningful_generate_parameter(initial_state) -> None:
         load_2, _ = zch.load(initial_state, lambda x: x + 1, 0, folder=folder)
         _assert_object_equals(expected_object, load_1)
         _assert_object_equals(expected_object, load_2)
+
+
+@hp.given(id_1=st.integers(), id_2=st.integers())
+def test_load_unique_id_parameter(id_1, id_2) -> None:
+    """
+    Tests the load function with two objects and two IDs to determine if the
+    objects are stored independently and can be retrieved independently.
+    """
+
+    hp.assume(id_1 != id_2)
+
+    with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
+        folder = Path(dir_name)
+        id_1_loads = set()
+        id_2_loads = set()
+        load, _ = zch.load(None, lambda _: id_1, id_1, folder=folder)
+        id_1_loads.add(load)
+        load, _ = zch.load(None, lambda _: id_2, id_2, folder=folder)
+        id_2_loads.add(load)
+        load, _ = zch.load(None, lambda _: id_1, id_1, folder=folder)
+        id_1_loads.add(load)
+        load, _ = zch.load(None, lambda _: id_2, id_2, folder=folder)
+        id_2_loads.add(load)
+        assert id_1 in id_1_loads
+        assert len(id_1_loads) == 1
+        assert id_2 in id_2_loads
+        assert len(id_2_loads) == 1
