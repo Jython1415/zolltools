@@ -48,6 +48,7 @@ def load(  # pylint: disable=too-many-arguments
     recommended that you only change this to manually avert a detected
     collision that is unavoidable otherwise. The default hash function is the
     built-in `hash`.
+    :returns: the object and the path to the object.
     """
 
     if reload is None:
@@ -73,10 +74,29 @@ def load(  # pylint: disable=too-many-arguments
 
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:
+    """
+    Compares two states to determine whether they are different. Returns true if
+    the states are different.
+
+    :param prev_state: the previous state.
+    :param state: the current state.
+    :returns: True if the states are different. False otherwise.
+    """
+
     return prev_state != state
 
 
 def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> T:
+    """
+    Stores the output of `generate(state)` at `file_path`, overwriting the
+    existing file as necessary.
+
+    :param file_path: the path to store the object at.
+    :state: the state from which to generate the object.
+    :generate: the function used to generate the object to store.
+    :returns: the object that is stored.
+    """
+
     with open(file_path, "wb") as file:
         stored_object = generate(state)
         pickle.dump(StorageObject(state, stored_object), file)
