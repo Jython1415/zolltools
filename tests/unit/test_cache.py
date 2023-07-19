@@ -6,17 +6,16 @@ import hypothesis as hp
 import hypothesis.strategies as st
 from zolltools import cache as zch
 
-integer_or_text = st.one_of(st.integers(), st.text())
-df_3x3 = st.just(pd.DataFrame(np.arange(1, 10).reshape(3, 3)))
-
-
-@hp.given(
-    obj_to_store=st.one_of(
-        integer_or_text,
-        df_3x3,
-        st.dictionaries(integer_or_text, integer_or_text),
-    )
+st_integer_or_text = st.one_of(st.integers(), st.text())
+st_df_3x3 = st.just(pd.DataFrame(np.arange(1, 10).reshape(3, 3)))
+st_object_to_store = st.one_of(
+    st_integer_or_text,
+    st_df_3x3,
+    st.dictionaries(st_integer_or_text, st_integer_or_text),
 )
+
+
+@hp.given(obj_to_store=st_object_to_store)
 def test_load_object_storage(obj_to_store) -> None:
     """
     Tests the load function with various objects.
