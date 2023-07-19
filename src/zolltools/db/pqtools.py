@@ -14,10 +14,14 @@ logger.addHandler(logging.NullHandler())
 
 
 class ParquetManager:
-    """Class for interfacing with a directory of parquet tables."""
+    """
+    Class for interfacing with a directory of parquet tables.
+    """
 
     class Config:  # pylint: disable=too-few-public-methods
-        """Class that represents the configuration of a parquet manager"""
+        """
+        Class that represents the configuration of a parquet manager.
+        """
 
         def __init__(
             self,
@@ -25,11 +29,12 @@ class ParquetManager:
             default_target_in_memory_size: int = int(1e8),
         ) -> None:
             """
-            Initializes a new Config object
+            Initializes a new Config object.
 
-            :param dir_path: the path to the folder containing the parquet files
+            :param dir_path: the path to the folder containing the parquet
+            files.
             :param default_target_in_memory_size: the default target memory size
-            to use when loading chunks of large tables into memory
+            to use when loading chunks of large tables into memory.
             """
 
             self.dir_path = dir_path
@@ -40,7 +45,9 @@ class ParquetManager:
             )
 
         def __str__(self):
-            """Returns a user-friendly string representation"""
+            """
+            Returns a user-friendly string representation.
+            """
 
             return (
                 f"Config\n\tDirectory: {self.dir_path}\n\t"
@@ -50,16 +57,16 @@ class ParquetManager:
         def __repr__(self):
             """
             Returns a developer-friendly string representation. Format is
-            "Config({dir_path}, {default_target_in_memory_size})"
+            "Config({dir_path}, {default_target_in_memory_size})".
             """
 
             return f"Config({self.dir_path}, {self.default_target_in_memory_size})"
 
     def __init__(self, config: Config):
         """
-        Initializes a new ParquetManager with a configuration
+        Initializes a new ParquetManager with a configuration.
 
-        :param config: the configuration to use
+        :param config: the configuration to use.
         """
 
         self.config = config
@@ -71,7 +78,7 @@ class ParquetManager:
         read into memory for this calculation.
 
         :param pq_file: the parquet file to read a row of.
-        :returns: the size of the row in memory as a row of a pandas data frame
+        :returns: the size of the row in memory as a row of a pandas data frame.
         """
 
         pq_iter = pq_file.iter_batches(batch_size=1)
@@ -86,7 +93,7 @@ class ParquetManager:
 
         :param pq_file: the parquet file to estimate the size of.
         :returns: the estimated size of the parquet file in memory as a pandas
-        data frame
+        data frame.
         """
 
         row_size = self._calc_row_size(pq_file)
@@ -148,7 +155,9 @@ class ParquetManager:
 
 
 class Reader(ParquetManager):
-    """Class to read and interface with a directory of parquet files"""
+    """
+    Class to read and interface with a directory of parquet files.
+    """
 
     @staticmethod
     def _pq_generator(pq_iter) -> pd.DataFrame:
@@ -157,13 +166,13 @@ class Reader(ParquetManager):
         The generator returns pandas.DataFrame objects instead of parquet
         batches.
 
-        :param pq_iter: the iterator for the parquet file to wrap
+        :param pq_iter: the iterator for the parquet file to wrap.
         """
 
         for batch in pq_iter:
             yield batch.to_pandas()
 
-    def get_metadata(self):
+    def get_metadata(self) -> None:
         """Docstring"""
 
         return None
@@ -174,10 +183,10 @@ class Reader(ParquetManager):
         """
         Gets a table from the directory.
 
-        :param file: the file to read
+        :param file: the file to read.
         :param columns: the columns to read from the table. Default is None, and
         all columns will be read.
-        :returns: a data frame representing the table that was read
+        :returns: a data frame representing the table that was read.
         """
 
         pq_file = pq.ParquetFile(file)
@@ -200,9 +209,9 @@ class Reader(ParquetManager):
 
         :param file: the file to read.
         :param columns: columns of the table to read. If set to None, all
-        columns will be read
+        columns will be read.
         :param target_in_memory_size: target size for each chunk (data frame) in
-        memory
+        memory.
         """
 
         if target_in_memory_size is None:
@@ -221,15 +230,16 @@ class Reader(ParquetManager):
 
 
 class Writer(ParquetManager):
-    """Module for writing and erasing parquet files to the directory"""
+    """
+    Module for writing and erasing parquet files to the directory.
+    """
 
     def save(self, frame: pd.DataFrame, file: Path) -> None:
         """
         Saves a data frame and returns the path to the file.
 
-        :param frame: pandas data frame to save
+        :param frame: pandas data frame to save.
         :param file: the path to save the file table to.
-        :returns:
         """
 
         frame.to_parquet(file, engine="fastparquet", index=False)
