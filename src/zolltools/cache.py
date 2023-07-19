@@ -59,7 +59,7 @@ def load(  # pylint: disable=too-many-arguments
         hash_func = hash
     assert hash_func is not None
 
-    file_path = folder.joinpath(uuid.UUID(int=hash_func(str(unique_id)).hex))
+    file_path = folder.joinpath(uuid.UUID(int=hash_func(str(unique_id))).hex)
     if not file_path.exists() or force_update:
         return (_store(file_path, state, generate), file_path)
 
