@@ -114,6 +114,7 @@ class ParquetManager:
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
+        assert target_in_memory_size is not None
         pq_file = pq.ParquetFile(file)
         size = self._calc_row_size(pq_file)
         num_rows = math.floor(target_in_memory_size / size)
