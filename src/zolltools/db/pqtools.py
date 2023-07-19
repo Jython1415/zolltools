@@ -24,7 +24,7 @@ class ParquetManager:
             self,
             db_path: Path = Path.cwd(),
             default_target_in_memory_size: int = int(1e8),
-        ):
+        ) -> None:
             """
             Initializes a new Config object
 
@@ -64,23 +64,6 @@ class ParquetManager:
         """
 
         self.config = config
-
-    def _get_parquet_file(self, file: Path) -> tuple[pq.ParquetFile, Path]:
-        """
-        Returns the parquet file object and Path object given the name (w/o the
-        file extension) of a parquet file.
-
-        :param file: the file to read
-        :returns: (pq.ParquetFile, Path)
-        """
-
-        logger.debug(
-            "ParquetManager._get_parquet_file: returned path and "
-            "pyarrow.parquet.ParquetFile for %s",
-            file,
-        )
-
-        return (pq.ParquetFile(file), file)
 
     def _calc_row_size(self, pq_file: pq.ParquetFile) -> int:
         """
@@ -129,7 +112,7 @@ class ParquetManager:
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
-        pq_file, _ = self._get_parquet_file(file)
+        pq_file = pq.ParquetFile(file)
         size = self._calc_row_size(pq_file)
         num_rows = math.floor(target_in_memory_size / size)
         logger.debug(
@@ -147,7 +130,7 @@ class ParquetManager:
         :returns: the columns in the table.
         """
 
-        pq_file, _ = self._get_parquet_file(file)
+        pq_file = pq.ParquetFile(file)
         return [column.name for column in pq_file.schema]
 
     def get_tables(self) -> list[Path]:
@@ -194,7 +177,7 @@ class Reader(ParquetManager):
         :returns: a data frame representing the table that was read
         """
 
-        pq_file, _ = self._get_parquet_file(file)
+        pq_file = pq.ParquetFile(file)
         estimated_file_size = self._calc_file_size(file)
         file_size_limit = self.config.default_target_in_memory_size
         if estimated_file_size > file_size_limit:
@@ -222,11 +205,11 @@ class Reader(ParquetManager):
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         chunk_size = self._calc_chunk_size(file)
-        pq_file, pq_path = self._get_parquet_file(file)
+        pq_file = pq.ParquetFile(file)
         pq_iter = pq_file.iter_batches(batch_size=chunk_size, columns=columns)
         logger.info(
             "Reader.get_reader: Returning reader for %s with chunk size %d",
-            pq_path,
+            file,
             chunk_size,
         )
 
@@ -261,9 +244,8 @@ class Writer(ParquetManager):
 
         log_prefix = "Writer.remove"
 
-        _, pq_path = self._get_parquet_file(file)
-        if pq_path.exists():
-            os.remove(pq_path)
+        if file.exists():
+            os.remove(file)
             logger.info("%s: removed %s", log_prefix, file)
             return True
         logger.info("%s: %s could not be found", log_prefix, file)
