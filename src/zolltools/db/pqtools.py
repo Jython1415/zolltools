@@ -187,7 +187,10 @@ class Reader(ParquetManager):
         return None
 
     def get_table(
-        self, file: Path, columns: Optional[list[str]] = None
+        self,
+        file: Path,
+        columns: Optional[list[str]] = None,
+        suppress_error: bool = False,
     ) -> pd.DataFrame:
         """
         Gets a table from the directory.
@@ -195,6 +198,8 @@ class Reader(ParquetManager):
         :param file: the file to read.
         :param columns: the columns to read from the table. Default is None, and
         all columns will be read.
+        :param suppress_error: set to True to suppress the warning for memory
+        usage.
         :returns: a data frame representing the table that was read.
         """
 
@@ -202,7 +207,7 @@ class Reader(ParquetManager):
         pq_file = pq.ParquetFile(file)
         estimated_file_size = self._calc_file_size(file)
         file_size_limit = self.config.default_target_in_memory_size
-        if estimated_file_size > file_size_limit:
+        if not suppress_error and estimated_file_size > file_size_limit:
             raise MemoryError(
                 f"Estimated file size, {estimated_file_size}, is greater than "
                 f"the file size limit, {file_size_limit}."
