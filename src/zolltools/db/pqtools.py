@@ -89,6 +89,7 @@ class ParquetManager:
         :returns: the size of the row in memory as a row of a pandas data frame.
         """
 
+        assert isinstance(pq_file, pq.ParquetFile), f"type: {type(pq_file)}"
         pq_iter = pq_file.iter_batches(batch_size=1)
         row = next(pq_iter).to_pandas()
         return row.memory_usage(index=True, deep=True).sum()
@@ -104,6 +105,7 @@ class ParquetManager:
         data frame.
         """
 
+        assert isinstance(pq_file, pq.ParquetFile), f"type: {type(pq_file)}"
         row_size = self._calc_row_size(pq_file)
         num_rows = pq_file.metadata.num_rows
         return row_size * num_rows
@@ -205,7 +207,8 @@ class Reader(ParquetManager):
 
         self._enforce_directory(file)
         pq_file = pq.ParquetFile(file)
-        estimated_file_size = self._calc_file_size(file)
+        assert isinstance(pq_file, pq.ParquetFile), f"type: {type(pq_file)}"
+        estimated_file_size = self._calc_file_size(pq_file)
         file_size_limit = self.config.default_target_in_memory_size
         if not suppress_error and estimated_file_size > file_size_limit:
             raise MemoryError(

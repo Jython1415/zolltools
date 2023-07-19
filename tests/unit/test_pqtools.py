@@ -78,10 +78,12 @@ def test_get_table(
     """
 
     table_path, frame = tmp_table_3x3
+    assert isinstance(table_path, Path)
+    assert isinstance(frame, pd.DataFrame)
     data_dir = table_path.parent
     pq_config = pqtools.ParquetManager.Config(data_dir)
     pq_reader = pqtools.Reader(pq_config)
-    loaded_frame = pq_reader.get_table(table_path.name.removesuffix(".parquet"))
+    loaded_frame = pq_reader.get_table(table_path)
     pd.testing.assert_frame_equal(frame, loaded_frame)
 
 
@@ -97,13 +99,13 @@ def test_get_table_warning(
     pq_config = pqtools.ParquetManager.Config(data_dir, default_target_in_memory_size=1)
     pq_reader = pqtools.Reader(pq_config)
     with pytest.raises(MemoryError):
-        _ = pq_reader.get_table(table_path.name.removesuffix(".parquet"))
+        _ = pq_reader.get_table(table_path)
 
     pq_config = pqtools.ParquetManager.Config(
         data_dir, default_target_in_memory_size=1000
     )
     pq_reader = pqtools.Reader(pq_config)
-    loaded_frame = pq_reader.get_table(table_path.name.removesuffix(".parquet"))
+    loaded_frame = pq_reader.get_table(table_path)
     pd.testing.assert_frame_equal(frame, loaded_frame)
 
 
@@ -118,6 +120,4 @@ def test_get_column(
     data_dir = table_path.parent
     pq_config = pqtools.ParquetManager.Config(data_dir)
     pq_reader = pqtools.Reader(pq_config)
-    assert list(frame.columns) == pq_reader.get_columns(
-        table_path.name.removesuffix(".parquet")
-    )
+    assert list(frame.columns) == pq_reader.get_columns(table_path)
