@@ -223,27 +223,25 @@ class Reader(ParquetManager):
 class Writer(ParquetManager):
     """Module for writing and erasing parquet files to the directory"""
 
-    def save(self, frame: pd.DataFrame, file: Path) -> Path:
+    def save(self, frame: pd.DataFrame, file: Path) -> None:
         """
         Saves a data frame and returns the path to the file.
 
         :param frame: pandas data frame to save
         :param file: the path to save the file table to.
-        :returns: (name, Path object pointing to file)
+        :returns:
         """
 
         parquet_path = file
         frame.to_parquet(parquet_path, engine="fastparquet", index=False)
         logger.info("Writer.save: saved %s", parquet_path)
-        return parquet_path
 
     def remove(self, file: Path) -> bool:
         """
-        Removes a table if it exists. Returns success of the
-        operation.
+        Removes a table if it exists.
 
         :param file: the file to remove.
-        :returns: bool indicating success of the removal
+        :returns: True if successful, False otherwise.
         """
 
         log_prefix = "Writer.remove"
