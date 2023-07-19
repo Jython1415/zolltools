@@ -232,9 +232,8 @@ class Writer(ParquetManager):
         :returns:
         """
 
-        parquet_path = file
-        frame.to_parquet(parquet_path, engine="fastparquet", index=False)
-        logger.info("Writer.save: saved %s", parquet_path)
+        frame.to_parquet(file, engine="fastparquet", index=False)
+        logger.info("Writer.save: saved %s", file)
 
     def remove(self, file: Path) -> bool:
         """
