@@ -35,9 +35,6 @@ class ParquetManager:
 
             self.db_path = db_path
             self.default_target_in_memory_size = default_target_in_memory_size
-            self.tmp_path = db_path.joinpath("tmp")
-            if not self.tmp_path.exists():
-                os.mkdir(self.tmp_path)
             logger.debug(
                 "ParquetManagerConfig.__init__: new configuration created %s",
                 repr(self),
@@ -48,20 +45,16 @@ class ParquetManager:
 
             return (
                 f"Config\n\tDatabase: {self.db_path}\n\t"
-                f"Temporary: {self.tmp_path}\n\t"
                 f"Target Memory: {self.default_target_in_memory_size}"
             )
 
         def __repr__(self):
             """
             Returns a developer-friendly string representation. Format is
-            "Config({db_path}, {tmp_path}, {default_target_in_memory_size})"
+            "Config({db_path}, {default_target_in_memory_size})"
             """
 
-            return (
-                f"Config({self.db_path}, {self.tmp_path}, "
-                f"{self.default_target_in_memory_size})"
-            )
+            return f"Config({self.db_path}, {self.default_target_in_memory_size})"
 
     def __init__(self, config: Config):
         """
@@ -71,18 +64,6 @@ class ParquetManager:
         """
 
         self.config = config
-
-    def _get_dir_path(self, tmp: bool):
-        """
-        Returns the directory path depending on whether `tmp` (temporary
-        directory) is selected or not.
-
-        :param tmp: When `False`, returns `self.config.db_path`, otherwise
-        returns `self.config.tmp_path`
-        :returns: path to directory
-        """
-
-        return self.config.tmp_path if tmp else self.config.db_path
 
     def _get_parquet_file(self, file: Path) -> tuple[pq.ParquetFile, Path]:
         """
@@ -255,24 +236,23 @@ class Reader(ParquetManager):
 class Writer(ParquetManager):
     """Module for writing and erasing parquet files to the database"""
 
-    def save(self, frame: pd.DataFrame, name: str) -> Path:
+    def save(self, frame: pd.DataFrame, file: Path) -> Path:
         """
-        Saves a data frame to the temporary storage folder, and returns the name
-        and path to the file.
+        Saves a data frame and returns the path to the file.
 
         :param frame: pandas data frame to save
-        :param name: name for the table
+        :param file: the path to save the file table to.
         :returns: (name, Path object pointing to file)
         """
 
-        parquet_path = self.config.tmp_path.joinpath(f"{name}.parquet")
+        parquet_path = file
         frame.to_parquet(parquet_path, engine="fastparquet", index=False)
-        logger.info("Writer.save: saved %s to %s", name, parquet_path)
+        logger.info("Writer.save: saved %s", parquet_path)
         return parquet_path
 
     def remove(self, file: Path) -> bool:
         """
-        Removes a temporary table if it exists. Returns success of the
+        Removes a table if it exists. Returns success of the
         operation.
 
         :param file: the file to remove.
