@@ -27,6 +27,7 @@ class ParquetManager:
             self,
             dir_path: Path = Path.cwd(),
             default_target_in_memory_size: int = int(1e8),
+            enforce_directory: bool = True,
         ) -> None:
             """
             Initializes a new Config object.
@@ -35,10 +36,13 @@ class ParquetManager:
             files.
             :param default_target_in_memory_size: the default target memory size
             to use when loading chunks of large tables into memory.
+            :param enforce_directory: whether to raise errors when a method
+            attempts to access a file outside of `dir_path`.
             """
 
             self.dir_path = dir_path
             self.default_target_in_memory_size = default_target_in_memory_size
+            self.enforce_directory = enforce_directory
             logger.debug(
                 "ParquetManagerConfig.__init__: new configuration created %s",
                 repr(self),
@@ -70,6 +74,10 @@ class ParquetManager:
         """
 
         self.config = config
+
+    def _enforce_directory(self, file: Path) -> None:
+        if self.config.enforce_directory and file.parent != self.config.dir_path:
+            raise ValueError(f"{file} is not in the directory {self.config.dir_path}")
 
     def _calc_row_size(self, pq_file: pq.ParquetFile) -> int:
         """
@@ -139,6 +147,7 @@ class ParquetManager:
         :returns: the columns in the table.
         """
 
+        self._enforce_directory(file)
         pq_file = pq.ParquetFile(file)
         return [column.name for column in pq_file.schema]
 
@@ -189,6 +198,7 @@ class Reader(ParquetManager):
         :returns: a data frame representing the table that was read.
         """
 
+        self._enforce_directory(file)
         pq_file = pq.ParquetFile(file)
         estimated_file_size = self._calc_file_size(file)
         file_size_limit = self.config.default_target_in_memory_size
@@ -214,6 +224,7 @@ class Reader(ParquetManager):
         memory.
         """
 
+        self._enforce_directory(file)
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         assert target_in_memory_size is not None
@@ -242,6 +253,7 @@ class Writer(ParquetManager):
         :param file: the path to save the file table to.
         """
 
+        self._enforce_directory(file)
         frame.to_parquet(file, engine="fastparquet", index=False)
         logger.info("Writer.save: saved %s", file)
 
@@ -255,6 +267,7 @@ class Writer(ParquetManager):
 
         log_prefix = "Writer.remove"
 
+        self._enforce_directory(file)
         if file.exists():
             os.remove(file)
             logger.info("%s: removed %s", log_prefix, file)
