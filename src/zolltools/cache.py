@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 import pickle
 from pathlib import Path
 from collections.abc import Callable
@@ -17,9 +18,10 @@ def load(  # pylint: disable=too-many-arguments
     generate: Callable[[State], T],
     unique_id: int,
     reload: Optional[Callable[[State, State], bool]] = None,
-    folder: Path = Path.cwd().joinpath("tmp"),
-    force_update=False,
-) -> T:
+    folder: Path = Path.cwd(),
+    force_update: bool = False,
+    hash_func: Optional[Callable[[object], int]] = None,
+) -> tuple[T, Path]:
     """
     Placeholder docstring
     """
@@ -28,9 +30,13 @@ def load(  # pylint: disable=too-many-arguments
         reload = _default_state_comparison
     assert reload is not None
 
-    file_path = folder.joinpath(f"{unique_id}.pkl")
+    if hash_func is None:
+        hash_func = hash
+    assert hash_func is not None
+
+    file_path = folder.joinpath(uuid.UUID(int=hash_func(str(unique_id)).hex))
     if not file_path.exists() or force_update:
-        return _store(file_path, state, generate)
+        return (_store(file_path, state, generate), file_path)
 
     with open(file_path, "rb") as file:
         stored_object_package: StorageObject = pickle.load(file)
@@ -39,7 +45,7 @@ def load(  # pylint: disable=too-many-arguments
     if reload(prev_state, state):
         stored_object = _store(file_path, state, generate)
 
-    return stored_object
+    return (stored_object, file_path)
 
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:
