@@ -138,7 +138,7 @@ class ParquetManager:
 
     def get_tables(self) -> list[Path]:
         """
-        Returns a list of the names of parquet tables in the database.
+        Returns a list of the paths of parquet tables in the database.
 
         :returns: a list of files.
         """
