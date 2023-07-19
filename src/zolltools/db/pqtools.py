@@ -3,9 +3,9 @@
 import os
 import math
 import logging
-from typing import Union
 from pathlib import Path
 from types import GeneratorType
+from typing import Union, Optional
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -94,18 +94,20 @@ class ParquetManager:
         num_rows = pq_file.metadata.num_rows
         return row_size * num_rows
 
-    def _calc_chunk_size(self, file: Path, target_in_memory_size: int = None) -> int:
+    def _calc_chunk_size(
+        self, file: Path, target_in_memory_size: Optional[int] = None
+    ) -> int:
         """
         Returns the optimal chunk size for reading a parquet file.
         Estimates the number of rows that will keep the in-memory size of the
-        chunk close to the target_in_memory_size (or
+        chunk close to the `target_in_memory_size` (or
         `default_target_in_memory_size` if the value is not provided).
 
-        :param file: the file to calculate chunk size for
-        :param target_in_memory_size: the target in-memory size for the chunk
-        :returns: the integer number of rows that should be included in each
+        :param file: the file to calculate chunk size for.
+        :param target_in_memory_size: the target in-memory size for the chunk.
+        :returns: the number of rows that should be included in each
         chunk to get the in-memory size of the chunk close to the
-        `target_in_memory_size`
+        `target_in_memory_size`.
         """
 
         log_prefix = "ParquetManager._calc_chunk_size"
