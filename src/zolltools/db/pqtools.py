@@ -94,7 +94,7 @@ class ParquetManager:
         num_rows = pq_file.metadata.num_rows
         return row_size * num_rows
 
-    def _calc_chunk_size(self, file: Path, target_in_memory_size=None) -> int:
+    def _calc_chunk_size(self, file: Path, target_in_memory_size: int = None) -> int:
         """
         Returns the optimal chunk size for reading a parquet file.
         Estimates the number of rows that will keep the in-memory size of the
