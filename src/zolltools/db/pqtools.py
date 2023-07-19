@@ -15,25 +15,25 @@ logger.addHandler(logging.NullHandler())
 
 
 class ParquetManager:
-    """Class that represents an object that interfaces with a parquet database"""
+    """Class for interfacing with a directory of parquet tables."""
 
     class Config:  # pylint: disable=too-few-public-methods
         """Class that represents the configuration of a parquet manager"""
 
         def __init__(
             self,
-            db_path: Path = Path.cwd(),
+            dir_path: Path = Path.cwd(),
             default_target_in_memory_size: int = int(1e8),
         ) -> None:
             """
             Initializes a new Config object
 
-            :param db_path: the path to the folder containing the parquet files
+            :param dir_path: the path to the folder containing the parquet files
             :param default_target_in_memory_size: the default target memory size
             to use when loading chunks of large tables into memory
             """
 
-            self.db_path = db_path
+            self.dir_path = dir_path
             self.default_target_in_memory_size = default_target_in_memory_size
             logger.debug(
                 "ParquetManagerConfig.__init__: new configuration created %s",
@@ -44,17 +44,17 @@ class ParquetManager:
             """Returns a user-friendly string representation"""
 
             return (
-                f"Config\n\tDatabase: {self.db_path}\n\t"
+                f"Config\n\tDirectory: {self.dir_path}\n\t"
                 f"Target Memory: {self.default_target_in_memory_size}"
             )
 
         def __repr__(self):
             """
             Returns a developer-friendly string representation. Format is
-            "Config({db_path}, {default_target_in_memory_size})"
+            "Config({dir_path}, {default_target_in_memory_size})"
             """
 
-            return f"Config({self.db_path}, {self.default_target_in_memory_size})"
+            return f"Config({self.dir_path}, {self.default_target_in_memory_size})"
 
     def __init__(self, config: Config):
         """
@@ -138,18 +138,18 @@ class ParquetManager:
 
     def get_tables(self) -> list[Path]:
         """
-        Returns a list of the paths of parquet tables in the database.
+        Returns a list of the paths of parquet tables in the directory.
 
         :returns: a list of files.
         """
 
-        dir_path = self.config.db_path
+        dir_path = self.config.dir_path
         logger.debug("ParquetManager.get_tables: reading from %s", dir_path)
         return list(dir_path.glob("*.parquet"))
 
 
 class Reader(ParquetManager):
-    """Class to read and interface with a database of parquet files"""
+    """Class to read and interface with a directory of parquet files"""
 
     @staticmethod
     def _pq_generator(pq_iter) -> pd.DataFrame:
@@ -173,7 +173,7 @@ class Reader(ParquetManager):
         self, file: Path, columns: Union[list[str], None] = None
     ) -> pd.DataFrame:
         """
-        Gets a table from the database.
+        Gets a table from the directory.
 
         :param file: the file to read
         :param columns: the columns to read from the table
@@ -220,7 +220,7 @@ class Reader(ParquetManager):
 
 
 class Writer(ParquetManager):
-    """Module for writing and erasing parquet files to the database"""
+    """Module for writing and erasing parquet files to the directory"""
 
     def save(self, frame: pd.DataFrame, file: Path) -> Path:
         """
