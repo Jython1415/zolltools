@@ -67,10 +67,26 @@ def test_load_state_usage(state) -> None:
             return prev_state == state
 
         load_1, _ = zch.load(
-            state, lambda _: obj_to_store, 1, folder=folder, reload=reload
+            state, lambda _: obj_to_store, 0, folder=folder, reload=reload
         )
         load_2, _ = zch.load(
-            state, lambda _: obj_to_store, 1, folder=folder, reload=reload
+            state, lambda _: obj_to_store, 0, folder=folder, reload=reload
         )
         _assert_object_equals(obj_to_store, load_1)
         _assert_object_equals(obj_to_store, load_2)
+
+
+@hp.given(initial_state=st.integers())
+def test_meaningful_generate_parameter(initial_state) -> None:
+    """
+    Tests the load function with a generate function that actually performs a
+    computation.
+    """
+
+    with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
+        folder = Path(dir_name)
+        expected_object = initial_state + 1
+        load_1, _ = zch.load(initial_state, lambda x: x + 1, 0, folder=folder)
+        load_2, _ = zch.load(initial_state, lambda x: x + 1, 0, folder=folder)
+        _assert_object_equals(expected_object, load_1)
+        _assert_object_equals(expected_object, load_2)
