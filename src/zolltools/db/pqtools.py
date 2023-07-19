@@ -4,8 +4,8 @@ import os
 import math
 import logging
 from pathlib import Path
+from typing import Optional
 from types import GeneratorType
-from typing import Union, Optional
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -170,13 +170,14 @@ class Reader(ParquetManager):
         return None
 
     def get_table(
-        self, file: Path, columns: Union[list[str], None] = None
+        self, file: Path, columns: Optional[list[str]] = None
     ) -> pd.DataFrame:
         """
         Gets a table from the directory.
 
         :param file: the file to read
-        :param columns: the columns to read from the table
+        :param columns: the columns to read from the table. Default is None, and
+        all columns will be read.
         :returns: a data frame representing the table that was read
         """
 
