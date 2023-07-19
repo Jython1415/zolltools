@@ -4,8 +4,7 @@ import os
 import math
 import logging
 from pathlib import Path
-from typing import Optional
-from types import GeneratorType
+from typing import Optional, Generator
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -194,8 +193,8 @@ class Reader(ParquetManager):
         return table.to_pandas()
 
     def get_reader(
-        self, file: Path, columns=None, target_in_memory_size=None
-    ) -> GeneratorType:
+        self, file: Path, columns=None, target_in_memory_size: Optional[int] = None
+    ) -> Generator[pd.DataFrame, None, None]:
         """
         Returns an iterator that yields data frames of chunks of the input file.
 
@@ -208,6 +207,7 @@ class Reader(ParquetManager):
 
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
+        assert target_in_memory_size is not None
         chunk_size = self._calc_chunk_size(file)
         pq_file = pq.ParquetFile(file)
         pq_iter = pq_file.iter_batches(batch_size=chunk_size, columns=columns)
