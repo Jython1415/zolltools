@@ -182,11 +182,6 @@ class Reader(ParquetManager):
         for batch in pq_iter:
             yield batch.to_pandas()
 
-    def get_metadata(self) -> None:
-        """Docstring"""
-
-        return None
-
     def get_table(
         self,
         file: Path,
