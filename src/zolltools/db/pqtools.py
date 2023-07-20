@@ -79,7 +79,7 @@ class ParquetManager:
         if self.config.enforce_directory and file.parent != self.config.dir_path:
             raise ValueError(f"{file} is not in the directory {self.config.dir_path}")
 
-    def _calc_row_size(self, pq_file: pq.ParquetFile) -> int:
+    def _calc_row_size(self, file: Path) -> int:
         """
         Returns the size (in bytes) of a row of a parquet file when converted to
         a pandas data frame. A single row of the parquet file (`pq_file`) is
@@ -89,11 +89,12 @@ class ParquetManager:
         :returns: the size of the row in memory as a row of a pandas data frame.
         """
 
+        pq_file = pq.ParquetFile(file)
         pq_iter = pq_file.iter_batches(batch_size=1)
         row = next(pq_iter).to_pandas()
         return row.memory_usage(index=True, deep=True).sum()
 
-    def _calc_file_size(self, pq_file: pq.ParquetFile) -> int:
+    def _calc_file_size(self, file: Path) -> int:
         """
         Returns the size (in bytes) of a parquet file in memory when it is
         converted to a pandas data frame. Only a single row of the parquet file
@@ -104,7 +105,8 @@ class ParquetManager:
         data frame.
         """
 
-        row_size = self._calc_row_size(pq_file)
+        row_size = self._calc_row_size(file)
+        pq_file = pq.ParquetFile(file)
         num_rows = pq_file.metadata.num_rows
         return row_size * num_rows
 
@@ -129,8 +131,7 @@ class ParquetManager:
         if target_in_memory_size is None:
             target_in_memory_size = self.config.default_target_in_memory_size
         assert target_in_memory_size is not None
-        pq_file = pq.ParquetFile(file)
-        size = self._calc_row_size(pq_file)
+        size = self._calc_row_size(file)
         num_rows = math.floor(target_in_memory_size / size)
         logger.debug(
             "%s: calculated chunk size to be %d rows",
