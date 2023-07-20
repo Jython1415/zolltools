@@ -32,7 +32,7 @@ class ParquetManager:
             """
             Initializes a new Config object.
 
-            :param dir_path: the path to the folder containing the parquet
+            :param dir_path: the path to the directory containing the parquet
             files.
             :param default_target_in_memory_size: the default target memory size
             to use when loading chunks of large tables into memory.
