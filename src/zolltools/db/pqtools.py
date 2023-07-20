@@ -200,14 +200,14 @@ class Reader(ParquetManager):
         """
 
         self._enforce_directory(file)
-        pq_file = pq.ParquetFile(file)
-        estimated_file_size = self._calc_file_size(pq_file)
+        estimated_file_size = self._calc_file_size(file)
         file_size_limit = self.config.default_target_in_memory_size
         if not suppress_error and estimated_file_size > file_size_limit:
             raise MemoryError(
                 f"Estimated file size, {estimated_file_size}, is greater than "
                 f"the file size limit, {file_size_limit}."
             )
+        pq_file = pq.ParquetFile(file)
         table = pq_file.read(columns=columns, use_pandas_metadata=True)
 
         return table.to_pandas()
