@@ -11,6 +11,7 @@ from typing import TypeVar, Optional, NamedTuple
 T = TypeVar("T")
 State = TypeVar("State")
 StorageObject = NamedTuple("StorageObject", [("state", State), ("stored_object", T)])
+Load = NamedTuple("Load", [("object", T), ("path", Path), ("generated", bool)])
 
 
 def load(  # pylint: disable=too-many-arguments
@@ -21,7 +22,7 @@ def load(  # pylint: disable=too-many-arguments
     force_update: bool = False,
     reload: Optional[Callable[[State, State], bool]] = None,
     hash_func: Optional[Callable[[object], int]] = None,
-) -> tuple[T, Path]:
+) -> Load:
     """
     Stores/loads an object to/from storage. The object is what is returned by
     `generate(state)`. If the object has not been stored yet, or if the `state`
@@ -48,7 +49,7 @@ def load(  # pylint: disable=too-many-arguments
     recommended that you only change this to manually avert a detected
     collision that is unavoidable otherwise. The default hash function is the
     built-in `hash`.
-    :returns: the object and the path to the object.
+    :returns: the object, it's cache path, and whether it was newly generated.
     """
 
     if reload is None:
@@ -62,32 +63,37 @@ def load(  # pylint: disable=too-many-arguments
     integer_id: int = abs(hash_func(str(unique_id))) % (1 << 128)
     file_path = folder.joinpath(uuid.UUID(int=integer_id).hex)
     if not file_path.exists() or force_update:
-        return (_store(file_path, state, generate), file_path)
+        return _store(file_path, state, generate)
 
     with open(file_path, "rb") as file:
         stored_object_package: StorageObject = pickle.load(file)
         prev_state, stored_object = stored_object_package
 
     if reload(prev_state, state):
-        stored_object = _store(file_path, state, generate)
+        return _store(file_path, state, generate)
 
-    return (stored_object, file_path)
+    return Load(stored_object, file_path, False)
 
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:
     """
     Compares two states to determine whether they are different. Returns true if
-    the states are different.
+    the states are different. Has a preference for `prev_state.equals(state)` if
+    the method exists.
 
     :param prev_state: the previous state.
     :param state: the current state.
     :returns: True if the states are different. False otherwise.
     """
 
+    equals = getattr(prev_state, "equals", None)
+    if callable(equals):
+        assert equals is not None
+        return not prev_state.equals(state)
     return prev_state != state
 
 
-def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> T:
+def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> Load:
     """
     Stores the output of `generate(state)` at `file_path`, overwriting the
     existing file as necessary.
@@ -101,4 +107,4 @@ def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> T:
     with open(file_path, "wb") as file:
         stored_object = generate(state)
         pickle.dump(StorageObject(state, stored_object), file)
-        return stored_object
+        return Load(stored_object, file_path, True)
