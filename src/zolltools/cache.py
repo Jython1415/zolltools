@@ -47,7 +47,7 @@ def load(  # pylint: disable=too-many-arguments
     cause the object to be regenerated.
     :param hash_func: the hash function used to determine the file name. It is
     recommended that you only change this to manually avert a detected
-    collision that is unavoidable otherwise. The default hash function is the
+    collision that is otherwise unavoidable. The default hash function is the
     built-in `hash`.
     :returns: the object, its cache path, and whether it was newly generated.
     """
