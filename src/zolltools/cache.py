@@ -49,7 +49,7 @@ def load(  # pylint: disable=too-many-arguments
     recommended that you only change this to manually avert a detected
     collision that is unavoidable otherwise. The default hash function is the
     built-in `hash`.
-    :returns: the object, it's cache path, and whether it was newly generated.
+    :returns: the object, its cache path, and whether it was newly generated.
     """
 
     if reload is None:
