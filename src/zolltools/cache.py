@@ -86,9 +86,7 @@ def _default_state_comparison(prev_state: State, state: State) -> bool:
     :returns: True if the states are different. False otherwise.
     """
 
-    equals = getattr(prev_state, "equals", None)
-    if callable(equals):
-        assert equals is not None
+    if hasattr(prev_state, "equals") and callable(prev_state.equals):
         return not prev_state.equals(state)
     return prev_state != state
 
