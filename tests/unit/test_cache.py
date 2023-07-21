@@ -147,3 +147,50 @@ def test_load_custom_reload_parameter() -> None:
         assert load1.generated
         assert not load2.generated
         assert load3.generated
+
+
+def test_load_folder() -> None:
+    """
+    Tests the folder parameter of the load function.
+    """
+
+    with tempfile.TemporaryDirectory(dir=Path.cwd()) as parent_name:
+        parent_dir = Path(parent_name)
+        with (
+            tempfile.TemporaryDirectory(dir=parent_dir) as dir1_name,
+            tempfile.TemporaryDirectory(dir=parent_dir) as dir2_name,
+        ):
+            dir1 = Path(dir1_name)
+            dir2 = Path(dir2_name)
+
+            def generate(num: int) -> Callable[[Any], int]:
+                return lambda _: num
+
+            load1_dir1 = zch.load(None, generate(1), 0, folder=dir1)
+            load1_dir2 = zch.load(None, generate(2), 0, folder=dir2)
+            load2_dir1 = zch.load(None, generate(1), 0, folder=dir1)
+            load2_dir2 = zch.load(None, generate(2), 0, folder=dir2)
+            assert load1_dir1.object == 1
+            assert load2_dir1.object == 1
+            assert load1_dir2.object == 2
+            assert load2_dir2.object == 2
+            assert not load2_dir1.generated
+            assert not load2_dir2.generated
+
+
+def test_load_force_update() -> None:
+    """
+    Tests the force_update parameter of the load function
+    """
+
+    with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
+        folder = Path(dir_name)
+
+        def generate(_) -> int:
+            return 1
+
+        load1 = zch.load(None, generate, 0, folder=folder)
+        load2 = zch.load(None, generate, 0, folder=folder, force_update=True)
+        assert load1.object == 1
+        assert load2.object == 1
+        assert load2.generated
