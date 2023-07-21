@@ -1,8 +1,8 @@
 """Tests for cache.py"""
 
 import tempfile
-from typing import Any
 from pathlib import Path
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -44,10 +44,15 @@ def test_load_object_storage(obj_to_store) -> None:
 
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
         folder = Path(dir_name)
-        load_1, _ = zch.load(None, lambda _: obj_to_store, 0, folder=folder)
-        load_2, _ = zch.load(None, lambda _: obj_to_store, 0, folder=folder)
-        _assert_object_equals(obj_to_store, load_1)
-        _assert_object_equals(obj_to_store, load_2)
+
+        def generate(_) -> Any:
+            return obj_to_store
+
+        load1 = zch.load(None, generate, 0, folder=folder)
+        load2 = zch.load(None, generate, 0, folder=folder)
+        _assert_object_equals(obj_to_store, load1.object)
+        _assert_object_equals(obj_to_store, load2.object)
+        assert not load2.generated
 
 
 @hp.given(state=st_any_object)
@@ -61,19 +66,14 @@ def test_load_state_usage(state) -> None:
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
         folder = Path(dir_name)
 
-        def reload(prev_state, state) -> bool:
-            if isinstance(prev_state, pd.DataFrame):
-                return prev_state.equals(state)
-            return prev_state == state
+        def generate(_) -> Any:
+            return obj_to_store
 
-        load_1, _ = zch.load(
-            state, lambda _: obj_to_store, 0, folder=folder, reload=reload
-        )
-        load_2, _ = zch.load(
-            state, lambda _: obj_to_store, 0, folder=folder, reload=reload
-        )
-        _assert_object_equals(obj_to_store, load_1)
-        _assert_object_equals(obj_to_store, load_2)
+        load1 = zch.load(state, generate, 0, folder=folder)
+        load2 = zch.load(state, generate, 0, folder=folder)
+        _assert_object_equals(obj_to_store, load1.object)
+        _assert_object_equals(obj_to_store, load2.object)
+        assert not load2.generated
 
 
 @hp.given(initial_state=st.integers())
@@ -86,34 +86,64 @@ def test_load_meaningful_generate_parameter(initial_state) -> None:
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
         folder = Path(dir_name)
         expected_object = initial_state + 1
-        load_1, _ = zch.load(initial_state, lambda x: x + 1, 0, folder=folder)
-        load_2, _ = zch.load(initial_state, lambda x: x + 1, 0, folder=folder)
-        _assert_object_equals(expected_object, load_1)
-        _assert_object_equals(expected_object, load_2)
+
+        def generate(state: int) -> int:
+            return state + 1
+
+        load1 = zch.load(initial_state, generate, 0, folder=folder)
+        load2 = zch.load(initial_state, generate, 0, folder=folder)
+        _assert_object_equals(expected_object, load1.object)
+        _assert_object_equals(expected_object, load2.object)
+        assert not load2.generated
 
 
-@hp.given(id_1=st.integers(), id_2=st.integers())
-def test_load_unique_id_parameter(id_1, id_2) -> None:
+@hp.given(id1=st.integers(), id2=st.integers())
+def test_load_unique_id_parameter(id1, id2) -> None:
     """
     Tests the load function with two objects and two IDs to determine if the
     objects are stored independently and can be retrieved independently.
     """
 
-    hp.assume(id_1 != id_2)
+    hp.assume(id1 != id2)
 
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
         folder = Path(dir_name)
-        id_1_loads = set()
-        id_2_loads = set()
-        load, _ = zch.load(None, lambda _: id_1, id_1, folder=folder)
-        id_1_loads.add(load)
-        load, _ = zch.load(None, lambda _: id_2, id_2, folder=folder)
-        id_2_loads.add(load)
-        load, _ = zch.load(None, lambda _: id_1, id_1, folder=folder)
-        id_1_loads.add(load)
-        load, _ = zch.load(None, lambda _: id_2, id_2, folder=folder)
-        id_2_loads.add(load)
-        assert id_1 in id_1_loads
-        assert len(id_1_loads) == 1
-        assert id_2 in id_2_loads
-        assert len(id_2_loads) == 1
+
+        def generate(unique_id: int) -> Callable[[Any], int]:
+            return lambda _: unique_id
+
+        load1_id1 = zch.load(None, generate(id1), id1, folder=folder)
+        load1_id2 = zch.load(None, generate(id2), id2, folder=folder)
+        load2_id1 = zch.load(None, generate(id1), id1, folder=folder)
+        load2_id2 = zch.load(None, generate(id2), id2, folder=folder)
+        assert load1_id1.object == id1
+        assert load2_id1.object == id1
+        assert load1_id2.object == id2
+        assert load2_id2.object == id2
+        assert not load2_id1.generated
+        assert not load2_id2.generated
+
+
+def test_load_custom_reload_parameter() -> None:
+    """
+    Tests the load function with a non-default reload parameter to determine
+    if the reload function is being used correctly.
+    """
+
+    with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
+        folder = Path(dir_name)
+
+        def custom_reload(_, right) -> bool:
+            return right >= 2
+
+        def generate(_) -> int:
+            return 1
+
+        load1 = zch.load(0, generate, 0, folder=folder, reload=custom_reload)
+        load2 = zch.load(1, generate, 0, folder=folder, reload=custom_reload)
+        load3 = zch.load(2, generate, 0, folder=folder, reload=custom_reload)
+        assert load1.object == load2.object
+        assert load1.object == load3.object
+        assert load1.generated
+        assert not load2.generated
+        assert load3.generated
