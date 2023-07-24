@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import uuid
 import pickle
 from pathlib import Path
 from collections.abc import Callable
@@ -13,14 +12,21 @@ T = TypeVar("T")
 State = TypeVar("State")
 StorageObject = NamedTuple("StorageObject", [("state", State), ("stored_object", T)])
 Load = NamedTuple(
-    "Load", [("object", T), ("path", Path), ("generated", bool), ("state_change", bool)]
+    "Load",
+    [
+        ("object", T),
+        ("path", Path),
+        ("generated", bool),
+        ("state_change", bool),
+        ("error", bool),
+    ],
 )
 
 
 def load(  # pylint: disable=too-many-arguments
     state: State,
     generate: Callable[[State], T],
-    unique_id: int,
+    unique_id: str,
     folder: Path = Path.cwd(),
     force_update: bool = False,
     reload: Optional[Callable[[State, State], bool]] = None,
@@ -64,10 +70,11 @@ def load(  # pylint: disable=too-many-arguments
         hash_func = hash
     assert hash_func is not None
 
-    integer_id: int = abs(hash_func(str(unique_id))) % (1 << 128)
-    file_path = folder.joinpath(uuid.UUID(int=integer_id).hex)
+    file_path = folder.joinpath(
+        f"{unique_id.lower().replace(' ', '_')}_{str(hash_func(unique_id))[-5:]}.cache"
+    )
     if not file_path.exists() or force_update:
-        return Load(*_store(file_path, state, generate), False)
+        return Load(*_store(file_path, state, generate), False, False)
 
     try:
         with open(file_path, "rb") as file:
@@ -75,12 +82,12 @@ def load(  # pylint: disable=too-many-arguments
             prev_state, stored_object = stored_object_package
     except (pickle.UnpicklingError, EOFError):
         os.remove(file_path)
-        return Load(*_store(file_path, state, generate), True)
+        return Load(*_store(file_path, state, generate), True, True)
 
     if reload(prev_state, state):
-        return Load(*_store(file_path, state, generate), True)
+        return Load(*_store(file_path, state, generate), True, False)
 
-    return Load(stored_object, file_path, False, False)
+    return Load(stored_object, file_path, False, False, False)
 
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:

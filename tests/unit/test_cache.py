@@ -48,8 +48,8 @@ def test_load_object_storage(obj_to_store) -> None:
         def generate(_) -> Any:
             return obj_to_store
 
-        load1 = zch.load(None, generate, 0, folder=folder)
-        load2 = zch.load(None, generate, 0, folder=folder)
+        load1 = zch.load(None, generate, "", folder=folder)
+        load2 = zch.load(None, generate, "", folder=folder)
         _assert_object_equals(obj_to_store, load1.object)
         _assert_object_equals(obj_to_store, load2.object)
         assert not load2.generated
@@ -70,8 +70,8 @@ def test_load_state_usage(state) -> None:
         def generate(_) -> Any:
             return obj_to_store
 
-        load1 = zch.load(state, generate, 0, folder=folder)
-        load2 = zch.load(state, generate, 0, folder=folder)
+        load1 = zch.load(state, generate, "", folder=folder)
+        load2 = zch.load(state, generate, "", folder=folder)
         _assert_object_equals(obj_to_store, load1.object)
         _assert_object_equals(obj_to_store, load2.object)
         assert not load2.generated
@@ -92,15 +92,45 @@ def test_load_meaningful_generate_parameter(initial_state) -> None:
         def generate(state: int) -> int:
             return state + 1
 
-        load1 = zch.load(initial_state, generate, 0, folder=folder)
-        load2 = zch.load(initial_state, generate, 0, folder=folder)
+        load1 = zch.load(initial_state, generate, "", folder=folder)
+        load2 = zch.load(initial_state, generate, "", folder=folder)
         _assert_object_equals(expected_object, load1.object)
         _assert_object_equals(expected_object, load2.object)
         assert not load2.generated
         assert not load2.state_change
 
 
-@hp.given(id1=st.integers(), id2=st.integers())
+st_safe_text = st.text(
+    st.characters(
+        whitelist_categories=(
+            "Ll",
+            "Lm",
+            "Lo",
+            "Lt",
+            "Lu",
+            "Mc",
+            "Me",
+            "Mn",
+            "Nd",
+            "Nl",
+            "No",
+            "Pc",
+            "Pd",
+            "Pe",
+            "Pf",
+            "Pi",
+            "Po",
+            "Ps",
+            "Sc",
+            "Sk",
+            "Sm",
+            "Zs",
+        )
+    )
+)
+
+
+@hp.given(id1=st_safe_text, id2=st_safe_text)
 def test_load_unique_id_parameter(id1, id2) -> None:
     """
     Tests the load function with two objects and two IDs to determine if the
@@ -108,11 +138,12 @@ def test_load_unique_id_parameter(id1, id2) -> None:
     """
 
     hp.assume(id1 != id2)
+    hp.assume("/" not in id1 and "/" not in id2)
 
     with tempfile.TemporaryDirectory(dir=Path.cwd()) as dir_name:
         folder = Path(dir_name)
 
-        def generate(unique_id: int) -> Callable[[Any], int]:
+        def generate(unique_id: str) -> Callable[[Any], str]:
             return lambda _: unique_id
 
         load1_id1 = zch.load(None, generate(id1), id1, folder=folder)
@@ -144,9 +175,9 @@ def test_load_custom_reload_parameter() -> None:
         def generate(_) -> int:
             return 1
 
-        load1 = zch.load(0, generate, 0, folder=folder, reload=custom_reload)
-        load2 = zch.load(1, generate, 0, folder=folder, reload=custom_reload)
-        load3 = zch.load(2, generate, 0, folder=folder, reload=custom_reload)
+        load1 = zch.load(0, generate, "", folder=folder, reload=custom_reload)
+        load2 = zch.load(1, generate, "", folder=folder, reload=custom_reload)
+        load3 = zch.load(2, generate, "", folder=folder, reload=custom_reload)
         assert load1.object == load2.object
         assert load1.object == load3.object
         assert load1.generated
@@ -174,10 +205,10 @@ def test_load_folder() -> None:
             def generate(num: int) -> Callable[[Any], int]:
                 return lambda _: num
 
-            load1_dir1 = zch.load(None, generate(1), 0, folder=dir1)
-            load1_dir2 = zch.load(None, generate(2), 0, folder=dir2)
-            load2_dir1 = zch.load(None, generate(1), 0, folder=dir1)
-            load2_dir2 = zch.load(None, generate(2), 0, folder=dir2)
+            load1_dir1 = zch.load(None, generate(1), "", folder=dir1)
+            load1_dir2 = zch.load(None, generate(2), "", folder=dir2)
+            load2_dir1 = zch.load(None, generate(1), "", folder=dir1)
+            load2_dir2 = zch.load(None, generate(2), "", folder=dir2)
             assert load1_dir1.object == 1
             assert load2_dir1.object == 1
             assert load1_dir2.object == 2
@@ -199,8 +230,8 @@ def test_load_force_update() -> None:
         def generate(_) -> int:
             return 1
 
-        load1 = zch.load(None, generate, 0, folder=folder)
-        load2 = zch.load(None, generate, 0, folder=folder, force_update=True)
+        load1 = zch.load(None, generate, "", folder=folder)
+        load2 = zch.load(None, generate, "", folder=folder, force_update=True)
         assert load1.object == 1
         assert load2.object == 1
         assert load2.generated
