@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import pickle
+import hashlib
 from pathlib import Path
 from collections.abc import Callable
 from typing import TypeVar, Optional, NamedTuple
@@ -30,7 +31,7 @@ def load(  # pylint: disable=too-many-arguments
     folder: Path = Path.cwd(),
     force_update: bool = False,
     reload: Optional[Callable[[State, State], bool]] = None,
-    hash_func: Optional[Callable[[object], int]] = None,
+    hash_func: Optional[Callable[[str], int]] = None,
 ) -> Load:
     """
     Stores/loads an object to/from storage. The object is what is returned by
@@ -67,7 +68,10 @@ def load(  # pylint: disable=too-many-arguments
     assert reload is not None
 
     if hash_func is None:
-        hash_func = hash
+
+        def hash_func(string: str) -> int:
+            return int(hashlib.sha512(string.encode("utf-8")).hexdigest(), 16)
+
     assert hash_func is not None
 
     file_path = folder.joinpath(
