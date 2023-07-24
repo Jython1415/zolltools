@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import uuid
 import pickle
 from pathlib import Path
@@ -11,7 +12,9 @@ from typing import TypeVar, Optional, NamedTuple
 T = TypeVar("T")
 State = TypeVar("State")
 StorageObject = NamedTuple("StorageObject", [("state", State), ("stored_object", T)])
-Load = NamedTuple("Load", [("object", T), ("path", Path), ("generated", bool)])
+Load = NamedTuple(
+    "Load", [("object", T), ("path", Path), ("generated", bool), ("state_change", bool)]
+)
 
 
 def load(  # pylint: disable=too-many-arguments
@@ -49,7 +52,8 @@ def load(  # pylint: disable=too-many-arguments
     recommended that you only change this to manually avert a detected
     collision that is otherwise unavoidable. The default hash function is the
     built-in `hash`.
-    :returns: the object, its cache path, and whether it was newly generated.
+    :returns: the object, its cache path, and whether it was newly generated,
+    and whether a state change was detected.
     """
 
     if reload is None:
@@ -63,16 +67,20 @@ def load(  # pylint: disable=too-many-arguments
     integer_id: int = abs(hash_func(str(unique_id))) % (1 << 128)
     file_path = folder.joinpath(uuid.UUID(int=integer_id).hex)
     if not file_path.exists() or force_update:
-        return _store(file_path, state, generate)
+        return Load(*_store(file_path, state, generate), False)
 
-    with open(file_path, "rb") as file:
-        stored_object_package: StorageObject = pickle.load(file)
-        prev_state, stored_object = stored_object_package
+    try:
+        with open(file_path, "rb") as file:
+            stored_object_package: StorageObject = pickle.load(file)
+            prev_state, stored_object = stored_object_package
+    except (pickle.UnpicklingError, EOFError):
+        os.remove(file_path)
+        return Load(*_store(file_path, state, generate), True)
 
     if reload(prev_state, state):
-        return _store(file_path, state, generate)
+        return Load(*_store(file_path, state, generate), True)
 
-    return Load(stored_object, file_path, False)
+    return Load(stored_object, file_path, False, False)
 
 
 def _default_state_comparison(prev_state: State, state: State) -> bool:
@@ -91,7 +99,9 @@ def _default_state_comparison(prev_state: State, state: State) -> bool:
     return prev_state != state
 
 
-def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> Load:
+def _store(
+    file_path: Path, state: State, generate: Callable[[State], T]
+) -> tuple[T, Path, bool]:
     """
     Stores the output of `generate(state)` at `file_path`, overwriting the
     existing file as necessary.
@@ -105,4 +115,4 @@ def _store(file_path: Path, state: State, generate: Callable[[State], T]) -> Loa
     with open(file_path, "wb") as file:
         stored_object = generate(state)
         pickle.dump(StorageObject(state, stored_object), file)
-        return Load(stored_object, file_path, True)
+        return stored_object, file_path, True

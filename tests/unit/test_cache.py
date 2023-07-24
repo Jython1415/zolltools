@@ -53,6 +53,7 @@ def test_load_object_storage(obj_to_store) -> None:
         _assert_object_equals(obj_to_store, load1.object)
         _assert_object_equals(obj_to_store, load2.object)
         assert not load2.generated
+        assert not load2.state_change
 
 
 @hp.given(state=st_any_object)
@@ -74,6 +75,7 @@ def test_load_state_usage(state) -> None:
         _assert_object_equals(obj_to_store, load1.object)
         _assert_object_equals(obj_to_store, load2.object)
         assert not load2.generated
+        assert not load2.state_change
 
 
 @hp.given(initial_state=st.integers())
@@ -95,6 +97,7 @@ def test_load_meaningful_generate_parameter(initial_state) -> None:
         _assert_object_equals(expected_object, load1.object)
         _assert_object_equals(expected_object, load2.object)
         assert not load2.generated
+        assert not load2.state_change
 
 
 @hp.given(id1=st.integers(), id2=st.integers())
@@ -122,6 +125,8 @@ def test_load_unique_id_parameter(id1, id2) -> None:
         assert load2_id2.object == id2
         assert not load2_id1.generated
         assert not load2_id2.generated
+        assert not load2_id1.state_change
+        assert not load2_id2.state_change
 
 
 def test_load_custom_reload_parameter() -> None:
@@ -145,8 +150,11 @@ def test_load_custom_reload_parameter() -> None:
         assert load1.object == load2.object
         assert load1.object == load3.object
         assert load1.generated
+        assert not load1.state_change
         assert not load2.generated
+        assert not load2.state_change
         assert load3.generated
+        assert load3.state_change
 
 
 def test_load_folder() -> None:
@@ -176,6 +184,8 @@ def test_load_folder() -> None:
             assert load2_dir2.object == 2
             assert not load2_dir1.generated
             assert not load2_dir2.generated
+            assert not load2_dir1.state_change
+            assert not load2_dir2.state_change
 
 
 def test_load_force_update() -> None:
@@ -194,3 +204,4 @@ def test_load_force_update() -> None:
         assert load1.object == 1
         assert load2.object == 1
         assert load2.generated
+        assert not load2.state_change
