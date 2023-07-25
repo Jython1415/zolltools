@@ -3,6 +3,7 @@
 import os
 import shutil
 import random
+import hashlib
 import tempfile
 import contextlib
 from pathlib import Path
@@ -56,7 +57,10 @@ def _temp_table_helper(
     :returns: the path to the temporary table.
     """
 
-    file_name = f"{str(hash(frame))[:5]}.parquet"
+    frame_hash = hashlib.sha256(
+        pd.util.hash_pandas_object(frame, index=True).values
+    ).hexdigest()[:5]
+    file_name = f"{frame_hash}.parquet"
     table_path = directory.joinpath(file_name)
     table = pa.Table.from_pandas(frame)
     pq.write_table(table, table_path)
@@ -179,3 +183,73 @@ def test_get_column(
     pq_config = pqtools.ParquetManager.Config(data_dir)
     pq_reader = pqtools.Reader(pq_config)
     assert list(frame.columns) == pq_reader.get_columns(table_path)
+
+
+def test_find_table_success() -> None:
+    """
+    Tests the find_table method to confirm it returns the correct table.
+    """
+
+    frame1 = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    frame2 = pd.DataFrame({"a": [1, 2, 3], "c": [7, 8, 9]})
+
+    with tempfile.TemporaryDirectory() as dir_name:
+        dir_path = Path(dir_name)
+        with (
+            _temp_table(frame1, dir_path) as table1_path,
+            _temp_table(frame2, dir_path) as table2_path,
+        ):
+            pq_config = pqtools.ParquetManager.Config(dir_path)
+            pq_reader = pqtools.Reader(pq_config)
+            assert table1_path == pq_reader.find_table("b")
+            assert table2_path == pq_reader.find_table("c")
+
+
+def test_find_table_no_matching_table() -> None:
+    """
+    Tests the find_table method to confirm it raises the expected exception when
+    no matching table can be found.
+    """
+
+    frame1 = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    frame2 = pd.DataFrame({"a": [1, 2, 3], "c": [7, 8, 9]})
+
+    with tempfile.TemporaryDirectory() as dir_name:
+        dir_path = Path(dir_name)
+        with (
+            _temp_table(frame1, dir_path) as _,
+            _temp_table(frame2, dir_path) as _,
+        ):
+            pq_config = pqtools.ParquetManager.Config(dir_path)
+            pq_reader = pqtools.Reader(pq_config)
+            search_column = "d"
+            with pytest.raises(
+                LookupError, match=f"No table with column {search_column}"
+            ):
+                pq_reader.find_table("d")
+
+
+def test_find_table_multiple_matching_tables() -> None:
+    """
+    Tests the find_table method to confirm it raises a LookupError when multiple
+    matching tables are found.
+    """
+
+    frame1 = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+    frame2 = pd.DataFrame({"a": [1, 2, 3], "b": [7, 8, 9]})
+
+    with tempfile.TemporaryDirectory() as dir_name:
+        dir_path = Path(dir_name)
+        with (
+            _temp_table(frame1, dir_path) as table1_path,
+            _temp_table(frame2, dir_path) as table2_path,
+        ):
+            pq_config = pqtools.ParquetManager.Config(dir_path)
+            pq_reader = pqtools.Reader(pq_config)
+            search_column = "b"
+            table_list = f"{table1_path.name}, {table2_path.name}"
+            with pytest.raises(
+                LookupError,
+                match=f"Multiple tables with column {search_column}: {table_list}",
+            ):
+                pq_reader.find_table("b")
