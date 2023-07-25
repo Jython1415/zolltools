@@ -3,8 +3,10 @@
 import os
 import shutil
 import random
+import tempfile
 import contextlib
 from pathlib import Path
+from typing import Optional, Generator
 
 import pytest
 import numpy as np
@@ -15,7 +17,9 @@ from zolltools.db import pqtools
 
 
 @contextlib.contextmanager
-def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
+def _temporary_parquet_table_context_manager(
+    frame: pd.DataFrame,
+) -> Generator[Path, None, None]:
     """
     Context manager for a temporary parquet table (used for testing). The
     context manager will delete the temporary directory and table upon closing.
@@ -38,6 +42,60 @@ def _temporary_parquet_table_context_manager(frame: pd.DataFrame) -> Path:
     finally:
         os.remove(table_path)
         shutil.rmtree(temporary_directory)
+
+
+@contextlib.contextmanager
+def _temp_table_helper(
+    frame: pd.DataFrame, directory: Path
+) -> Generator[Path, None, None]:
+    """
+    Context manager for a temporary parquet table.
+
+    :param frame: the data frame to store as a parquet table.
+    :param directory: the directory to store the temporary table.
+    :returns: the path to the temporary table.
+    """
+
+    file_name = f"{str(hash(frame))[:5]}.parquet"
+    table_path = directory.joinpath(file_name)
+    table = pa.Table.from_pandas(frame)
+    pq.write_table(table, table_path)
+    try:
+        yield table_path
+    finally:
+        os.remove(table_path)
+
+
+@contextlib.contextmanager
+def _temp_table(
+    frame: pd.DataFrame, directory: Optional[Path] = None
+) -> Generator[Path, None, None]:
+    """
+    Context manager for a temporary parquet table with an optional directory
+    parameter.
+
+    :param frame: the data frame to store as a parquet table.
+    :param directory: the directory to store the temporary table. If
+    unspecified, the table will be stored in a newly created temporary
+    directory which will be deleted upon closing.
+    :returns: the path to the temporary table.
+    """
+
+    if directory is None:
+        with (
+            tempfile.TemporaryDirectory() as dir_name,
+            _temp_table_helper(frame, Path(dir_name)) as table_path,
+        ):
+            try:
+                yield table_path
+            finally:
+                pass
+    else:
+        with _temp_table_helper(frame, directory) as table_path:
+            try:
+                yield table_path
+            finally:
+                pass
 
 
 @pytest.fixture(scope="module")
