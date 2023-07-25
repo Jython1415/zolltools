@@ -4,7 +4,7 @@ import os
 import math
 import logging
 from pathlib import Path
-from typing import Optional, Generator
+from typing import Optional, Generator, Any
 
 import pandas as pd
 import pyarrow.parquet as pq
@@ -239,6 +239,59 @@ class Reader(ParquetManager):
         )
 
         return Reader._pq_generator(pq_iter)
+
+    def find_table(self, column: str) -> Path:
+        """
+        Finds the table in the dataset that contains the column.
+
+        :param column: the column to find the table for.
+        :returns: the path to the table containing the column (if it exists).
+        :raises LookupError: if no tables contain the column or if multiple
+        tables contain the column.
+        """
+        tables = self.get_tables()
+        results = [table for table in tables if column in self.get_columns(table)]
+        if not results:
+            raise LookupError(f"No tables contain {column}")
+        if len(results) > 1:
+            raise LookupError(
+                f"Multiple tables contain {column}: {', '.join([path.name for path in results])}"
+            )
+        assert len(results) == 1
+        result = results[0]
+        return result
+
+    def query(
+        self, by_col: str, rows_matching: list[Any], cols: list[str]
+    ) -> pd.DataFrame:
+        """
+        Query the dataset by matching values in a column (of any table) to a
+        list. The query column, `by_col` must be present in every table in the
+        data set.
+
+        :param by_col: column to query by.
+        :param rows_matching: list of values to match.
+        :param cols: the columns to return.
+        :returns: a data frame containing the data queried.
+        """
+
+        result_frame = None
+        for column in cols:
+            table_path = self.find_table(column)
+            frame = pq.read_table(
+                table_path,
+                columns=[by_col, column],
+                filters=[[(by_col, "in", rows_matching)]],
+            ).to_pandas()
+            if not result_frame:
+                result_frame = frame
+            else:
+                result_frame = (
+                    result_frame.merge(frame, how="outer")
+                    .sort_values(by=by_col)
+                    .reset_index(drop=True)
+                )
+        return result_frame
 
 
 class Writer(ParquetManager):
