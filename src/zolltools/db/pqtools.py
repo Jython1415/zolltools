@@ -252,11 +252,10 @@ class Reader(ParquetManager):
         tables = self.get_tables()
         results = [table for table in tables if column in self.get_columns(table)]
         if not results:
-            raise LookupError(f"No tables contain {column}")
+            raise LookupError(f"No table with column {column}")
         if len(results) > 1:
-            raise LookupError(
-                f"Multiple tables contain {column}: {', '.join([path.name for path in results])}"
-            )
+            table_list = ", ".join(sorted([path.name for path in results]))
+            raise LookupError(f"Multiple tables with column {column}: {table_list}")
         assert len(results) == 1
         result = results[0]
         return result
