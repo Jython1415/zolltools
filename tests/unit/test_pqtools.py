@@ -365,6 +365,11 @@ def test_query_single_table(frame_dict, query, expected_dict) -> None:
             {"by_col": "a", "rows_matching": [1, 3], "cols": ["c", "a", "b"]},
             {"c": [7, 9], "a": [1, 3], "b": [4, 6]},
         ),
+        (  # test query with two columns in each table and removing the index column
+            [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [1, 2, 3], "c": [7, 8, 9]}],
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["b", "c"]},
+            {"b": [4, 6], "c": [7, 9]},
+        ),
     ],
 )
 def test_query_multiple_tables(frame_dicts, query, expected_dict) -> None:
