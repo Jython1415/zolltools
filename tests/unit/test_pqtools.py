@@ -328,6 +328,11 @@ def test_query_single_table(frame_dict, query, expected_dict) -> None:
             {"by_col": "a", "rows_matching": [1, 2, 5, 6], "cols": ["a"]},
             {"a": [1, 2, 5, 6]},
         ),
+        (  # test query with one column in each table with partial overlap
+            [{"a": [1, 2, 3]}, {"a": [3, 4, 5]}],
+            {"by_col": "a", "rows_matching": [1, 2, 3, 4, 5], "cols": ["a"]},
+            {"a": [1, 2, 3, 4, 5]},
+        ),
     ],
 )
 def test_query_multiple_tables(frame_dicts, query, expected_dict) -> None:
