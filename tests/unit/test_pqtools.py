@@ -67,7 +67,8 @@ def _temp_table_helper(
     try:
         yield table_path
     finally:
-        os.remove(table_path)
+        if table_path.exists():
+            os.remove(table_path)
 
 
 @contextlib.contextmanager
@@ -253,3 +254,101 @@ def test_find_table_multiple_matching_tables() -> None:
                 match=f"Multiple tables with column {search_column}: {table_list}",
             ):
                 pq_reader.find_table("b")
+
+
+@pytest.mark.parametrize(
+    ("frame_dict", "query", "expected_dict"),
+    [
+        (  # test query with only one column in the table
+            {"a": [1, 2, 3]},
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["a"]},
+            {"a": [1, 3]},
+        ),
+        (  # test query on on column in a two column table
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["b"]},
+            {"b": [4, 6]},
+        ),
+        (  # test query for both column in a two column table
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["a", "b"]},
+            {"a": [1, 3], "b": [4, 6]},
+        ),
+        (  # test query for both column in a two column table (switch order)
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"by_col": "b", "rows_matching": [5], "cols": ["b", "a"]},
+            {"b": [5], "a": [2]},
+        ),
+        (  # test query for two columns in a three column table (drop key column)
+            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]},
+            {"by_col": "c", "rows_matching": [9], "cols": ["b", "a"]},
+            {"b": [6], "a": [3]},
+        ),
+        (  # test query for last column in the three column table
+            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]},
+            {"by_col": "c", "rows_matching": [7], "cols": ["c"]},
+            {"c": [7]},
+        ),
+        (  # test query with no matching columns requested
+            {"a": [1, 2, 3]},
+            {"by_col": "a", "rows_matching": [1, 3], "cols": []},
+            {},
+        ),
+    ],
+)
+def test_query_single_table(frame_dict, query, expected_dict) -> None:
+    """
+    Tests the query method to confirm it returns the expected results when
+    querying a single table.
+    """
+
+    frame = pd.DataFrame(frame_dict)
+
+    with (
+        tempfile.TemporaryDirectory() as dir_name,
+        _temp_table(frame, Path(dir_name)) as _,
+    ):
+        pq_config = pqtools.ParquetManager.Config(Path(dir_name))
+        pq_reader = pqtools.Reader(pq_config)
+        expected = pd.DataFrame(expected_dict)
+        result = pq_reader.query(**query)
+        pd.testing.assert_frame_equal(result, expected)
+
+
+@pytest.mark.parametrize(
+    ("frame_dicts", "query", "expected_dict"),
+    [
+        (  # test query with one column in each table with perfect overlap
+            [{"a": [1, 2, 3]}, {"a": [1, 2, 3]}],
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["a"]},
+            {"a": [1, 3]},
+        ),
+        (  # test query with one column in each table with no overlap
+            [{"a": [1, 2, 3]}, {"a": [4, 5, 6]}],
+            {"by_col": "a", "rows_matching": [1, 2, 5, 6], "cols": ["a"]},
+            {"a": [1, 2, 5, 6]},
+        ),
+    ],
+)
+def test_query_multiple_tables(frame_dicts, query, expected_dict) -> None:
+    """
+    Tests the query method to confirm it returns the expected results when
+    querying multiple tables.
+    """
+
+    frames: list[pd.DataFrame] = [
+        pd.DataFrame(frame_dict) for frame_dict in frame_dicts
+    ]
+
+    with (
+        tempfile.TemporaryDirectory() as dir_name,
+        contextlib.ExitStack() as table_stack,
+    ):
+        dir_path = Path(dir_name)
+        for frame in frames:
+            table_stack.enter_context(_temp_table(frame, dir_path))
+        pq_config = pqtools.ParquetManager.Config(dir_path)
+        pq_reader = pqtools.Reader(pq_config)
+        expected = pd.DataFrame(expected_dict)
+        result = pq_reader.query(**query)
+        pd.testing.assert_frame_equal(result, expected)
