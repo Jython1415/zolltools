@@ -100,7 +100,7 @@ def test_load_meaningful_generate_parameter(initial_state) -> None:
         assert not load2.state_change
 
 
-st_safe_text = st.text(
+st_safe_text: st.SearchStrategy[str] = st.text(
     st.characters(
         whitelist_categories=(
             "Ll",
