@@ -132,8 +132,8 @@ def tmp_table_3x3_named_cols() -> tuple[Path, pd.DataFrame]:
 
 
 def test_get_table(
-    tmp_table_3x3: tuple[Path, pd.DataFrame]
-):  # pylint: disable=redefined-outer-name
+    tmp_table_3x3: tuple[Path, pd.DataFrame]  # pylint: disable=redefined-outer-name
+) -> None:
     """
     Tests get_table with a simple table
 
@@ -151,8 +151,8 @@ def test_get_table(
 
 
 def test_get_table_warning(
-    tmp_table_3x3: tuple[Path, pd.DataFrame]
-):  # pylint: disable=redefined-outer-name
+    tmp_table_3x3: tuple[Path, pd.DataFrame]  # pylint: disable=redefined-outer-name
+) -> None:
     """
     Tests if get_table returns a warning when the requested table is too large.
     """
@@ -173,8 +173,10 @@ def test_get_table_warning(
 
 
 def test_get_column(
-    tmp_table_3x3_named_cols: tuple[Path, pd.DataFrame]
-):  # pylint: disable=redefined-outer-name
+    tmp_table_3x3_named_cols: tuple[  # pylint: disable=redefined-outer-name
+        Path, pd.DataFrame
+    ]
+) -> None:
     """
     Tests get_column method
     """

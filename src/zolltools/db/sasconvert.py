@@ -20,7 +20,7 @@ logger.addHandler(logging.NullHandler())
 class Converter:
     """Class to convert a database directory containing SAS files to another format"""
 
-    def __init__(self, db_path: Path = Path.cwd(), target_in_memory_size=1e8):
+    def __init__(self, db_path: Path = Path.cwd(), target_in_memory_size=1e8) -> None:
         self.db_path = db_path
         self.target_in_memory_size = target_in_memory_size
         logger.debug("Converter: initialized to %s", self.db_path)
@@ -192,14 +192,14 @@ class Converter:
             converter: Converter,
             sas_path: Path,
             result_set: set,
-        ):
+        ) -> None:
             threading.Thread.__init__(self)
             self.thread_id = thread_id
             self.converter = converter
             self.sas_path = sas_path
             self.result_set = result_set
 
-        def run(self):
+        def run(self) -> None:
             print(f"thread {self.name} started")
             self.result_set.add(self.converter.convert_sas(self.sas_path))
 

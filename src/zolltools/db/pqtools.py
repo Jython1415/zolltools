@@ -48,7 +48,7 @@ class ParquetManager:
                 repr(self),
             )
 
-        def __str__(self):
+        def __str__(self) -> str:
             """
             Returns a user-friendly string representation.
             """
@@ -58,7 +58,7 @@ class ParquetManager:
                 f"Target Memory: {self.default_target_in_memory_size}"
             )
 
-        def __repr__(self):
+        def __repr__(self) -> str:
             """
             Returns a developer-friendly string representation. Format is
             "Config({dir_path}, {default_target_in_memory_size})".
@@ -66,7 +66,7 @@ class ParquetManager:
 
             return f"Config({self.dir_path}, {self.default_target_in_memory_size})"
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config) -> None:
         """
         Initializes a new ParquetManager with a configuration.
 

@@ -42,7 +42,7 @@ def test_add_handler_specific(logger_name) -> None:
 
 
 @hp.given(logger_names=st.sets(st.sampled_from(zoll_logging.LOGGERS), min_size=1))
-def test_add_handler_list(logger_names):
+def test_add_handler_list(logger_names) -> None:
     """
     Tests the add_handler function when adding a handler to a list of loggers
     """
