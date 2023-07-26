@@ -35,7 +35,7 @@ class ParquetManager:
             :param dir_path: the path to the directory containing the parquet
             files.
             :param default_target_in_memory_size: the default target memory size
-            to use when loading chunks of large tables into memory.
+            to use when loading chunks of large tables into memory (in bytes).
             :param enforce_directory: whether to raise errors when a method
             attempts to access a file outside of `dir_path`.
             """
@@ -120,7 +120,8 @@ class ParquetManager:
         `default_target_in_memory_size` if the value is not provided).
 
         :param file: the file to calculate chunk size for.
-        :param target_in_memory_size: the target in-memory size for the chunk.
+        :param target_in_memory_size: the target in-memory size for the chunk
+        (in bytes).
         :returns: the number of rows that should be included in each
         chunk to get the in-memory size of the chunk close to the
         `target_in_memory_size`.
