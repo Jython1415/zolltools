@@ -274,22 +274,25 @@ class Reader(ParquetManager):
         :returns: a data frame containing the data queried.
         """
 
-        result_frame = None
-        for column in cols:
+        if not cols:
+            return pd.DataFrame()
+
+        result_frame = pd.DataFrame({by_col: rows_matching})
+        for column in set(cols) - {by_col}:
             table_path = self.find_table(column)
             frame = pq.read_table(
                 table_path,
-                columns=[by_col, column],
+                columns=list(set([by_col, column])),
                 filters=[[(by_col, "in", rows_matching)]],
             ).to_pandas()
-            if not result_frame:
-                result_frame = frame
-            else:
-                result_frame = (
-                    result_frame.merge(frame, how="outer")
-                    .sort_values(by=by_col)
-                    .reset_index(drop=True)
-                )
+            result_frame = (
+                result_frame.merge(frame, how="outer")
+                .sort_values(by=by_col)
+                .reset_index(drop=True)
+            )
+        if by_col not in cols:
+            result_frame = result_frame.drop(columns=[by_col])
+        result_frame = result_frame[cols]
         return result_frame
 
 
