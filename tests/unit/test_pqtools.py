@@ -299,6 +299,11 @@ def test_find_table_multiple_matching_tables() -> None:
             {"by_col": "a", "rows_matching": [4, 6], "cols": ["a", "b"]},
             {"a": [4, 6], "b": [np.nan, np.nan]},
         ),
+        (  # test query with no matching rows requested and no index
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"by_col": "a", "rows_matching": [4, 6], "cols": ["b"]},
+            {"b": [np.nan, np.nan]},
+        ),
     ],
 )
 def test_query_single_table(frame_dict, query, expected_dict) -> None:
@@ -374,6 +379,11 @@ def test_query_single_table(frame_dict, query, expected_dict) -> None:
             [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [1, 2, 3], "c": [7, 8, 9]}],
             {"by_col": "a", "rows_matching": [1, 3], "cols": ["b", "c"]},
             {"b": [4, 6], "c": [7, 9]},
+        ),
+        (  # test query with no matching rows
+            [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [1, 2, 3], "c": [7, 8, 9]}],
+            {"by_col": "a", "rows_matching": [4], "cols": ["a", "b", "c"]},
+            {"a": [4], "b": [np.nan], "c": [np.nan]},
         ),
     ],
 )
