@@ -333,6 +333,38 @@ def test_query_single_table(frame_dict, query, expected_dict) -> None:
             {"by_col": "a", "rows_matching": [1, 2, 3, 4, 5], "cols": ["a"]},
             {"a": [1, 2, 3, 4, 5]},
         ),
+        (  # test query with two columns in each table with perfect overlap
+            [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [1, 2, 3], "c": [7, 8, 9]}],
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["a", "b", "c"]},
+            {"a": [1, 3], "b": [4, 6], "c": [7, 9]},
+        ),
+        (  # test query with two columns in each table with no overlap
+            [{"a": [1, 2, 3], "b": [7, 8, 9]}, {"a": [4, 5, 6], "c": [10, 11, 12]}],
+            {
+                "by_col": "a",
+                "rows_matching": [1, 2, 3, 4, 5, 6],
+                "cols": ["a", "b", "c"],
+            },
+            {
+                "a": [1, 2, 3, 4, 5, 6],
+                "b": [7, 8, 9, np.nan, np.nan, np.nan],
+                "c": [np.nan, np.nan, np.nan, 10, 11, 12],
+            },
+        ),
+        (  # test query with two columns in each table with partial overlap
+            [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [3, 4, 5], "c": [7, 8, 9]}],
+            {"by_col": "a", "rows_matching": [1, 2, 3, 4, 5], "cols": ["a", "b", "c"]},
+            {
+                "a": [1, 2, 3, 4, 5],
+                "b": [4, 5, 6, np.nan, np.nan],
+                "c": [np.nan, np.nan, 7, 8, 9],
+            },
+        ),
+        (  # test rearranging the order of the columns
+            [{"a": [1, 2, 3], "b": [4, 5, 6]}, {"a": [1, 2, 3], "c": [7, 8, 9]}],
+            {"by_col": "a", "rows_matching": [1, 3], "cols": ["c", "a", "b"]},
+            {"c": [7, 9], "a": [1, 3], "b": [4, 6]},
+        ),
     ],
 )
 def test_query_multiple_tables(frame_dicts, query, expected_dict) -> None:
