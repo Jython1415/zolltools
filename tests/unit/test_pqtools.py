@@ -294,6 +294,11 @@ def test_find_table_multiple_matching_tables() -> None:
             {"by_col": "a", "rows_matching": [1, 3], "cols": []},
             {},
         ),
+        (  # test query with not matching rows requested
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"by_col": "a", "rows_matching": [4, 6], "cols": ["a", "b"]},
+            {"a": [4, 6], "b": [np.nan, np.nan]},
+        ),
     ],
 )
 def test_query_single_table(frame_dict, query, expected_dict) -> None:
