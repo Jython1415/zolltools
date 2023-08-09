@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "zolltools"
-version = "0.0.6.dev70"
+version = "0.0.6.dev71"
 authors = [
   { name="Joshua Shew", email="joshua.t.shew@gmail.com" },
 ]
@@ -22,6 +22,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps."
 ]
 dependencies = [
+  "fastparquet>2023.1.0",
   "pandas>=0.4",
   "pyarrow>=2",
   "pyreadstat>=1.1.7",
