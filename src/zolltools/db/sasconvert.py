@@ -158,7 +158,7 @@ class Converter:
 
         return False not in results
 
-    def convert_sas(self, sas_path: Path) -> bool:
+    def convert_sas(self, sas_path: Path, delete: bool = False) -> bool:
         """
         Converts the input SAS file and deletes it if the conversion is
         successful.  Returns True upon success. Returns False if validation
@@ -175,11 +175,12 @@ class Converter:
             logger.error("%s: %s failed due to failed validation", log_prefix, sas_path)
             return False
 
-        sas_path = Converter._get_sas_path(parquet_path)
-        with open(sas_path, "w", encoding="utf-8"):
-            pass
-        os.remove(sas_path)
-        logger.info("%s: file %s deleted", log_prefix, sas_path)
+        if delete:
+            sas_path = Converter._get_sas_path(parquet_path)
+            with open(sas_path, "w", encoding="utf-8"):
+                pass
+            os.remove(sas_path)
+            logger.info("%s: file %s deleted", log_prefix, sas_path)
 
         return True
 
