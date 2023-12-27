@@ -10,7 +10,6 @@ from pathlib import Path
 from importlib import resources
 
 import zolltools
-from zolltools import strtools
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -146,9 +145,7 @@ def _list() -> None:
 
     storage_dir = _get_storage_dir()
     paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXTENSION}")
-    names = sorted(
-        [strtools.removesuffix(path.name, STORAGE_FOLDER_EXTENSION) for path in paths]
-    )
+    names = sorted([path.name.removesuffix(STORAGE_FOLDER_EXTENSION) for path in paths])
     logger.debug(
         "_list: %d categorizations identified in %s: %s",
         len(names),

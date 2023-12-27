@@ -11,7 +11,6 @@ from pathlib import Path
 
 import pyreadstat
 import pyarrow.parquet as pq
-from .. import strtools
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -36,7 +35,7 @@ class Converter:
         """
 
         return parquet_path.parent.joinpath(
-            f"{strtools.removesuffix(parquet_path.name, '.parquet')}.sas7bdat"
+            f"{parquet_path.name.removesuffix('.parquet')}.sas7bdat"
         )
 
     @staticmethod
@@ -50,7 +49,7 @@ class Converter:
         """
 
         parquet_path = sas_path.parent.joinpath(
-            f"{strtools.removesuffix(sas_path.name, '.sas7bdat')}.parquet"
+            f"{sas_path.name.removesuffix('.sas7bdat')}.parquet"
         )
         return parquet_path
 
