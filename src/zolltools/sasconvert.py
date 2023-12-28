@@ -9,8 +9,8 @@ import logging
 import threading
 from pathlib import Path
 
-import pyreadstat
-import pyarrow.parquet as pq
+import pyreadstat  # type: ignore
+import pyarrow.parquet as pq  # type: ignore
 
 module_logger = logging.getLogger(__name__)
 module_logger.addHandler(logging.NullHandler())

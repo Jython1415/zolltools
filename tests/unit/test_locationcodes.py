@@ -7,7 +7,7 @@ import importlib
 import pytest
 from scipy import stats  # type: ignore
 
-from zolltools.nemsis import locationcodes  # type: ignore
+from zolltools import locationcodes  # type: ignore
 
 
 @pytest.mark.slow
@@ -28,7 +28,7 @@ def test_get_mapping_performance() -> None:
     alpha = 0.05  # max p-value (exclusive)
     min_exp_speedup = 10
     num_data_points = 100  # see gh 74 for reasoning
-    data = {"successive": [], "adjusted-first-read": []}
+    data: dict[str, list] = {"successive": [], "adjusted-first-read": []}
     for _ in range(num_data_points):
         importlib.reload(locationcodes)
         successive_read_lower_bound_incl = 100
@@ -71,7 +71,7 @@ def test_get_mapping_correctness() -> None:
     mapping = locationcodes.get_mapping()
 
     # Check a value
-    expected = (
+    expected: str = (
         "Non-institutional (private) residence as the place of "
         "occurrence of the external cause"
     )
@@ -79,6 +79,6 @@ def test_get_mapping_correctness() -> None:
     assert result == expected
 
     # Check length
-    expected = 246
+    expected: int = 246  # type: ignore
     result = len(mapping)
     assert result == expected

@@ -4,7 +4,7 @@ from pathlib import Path
 import hypothesis as hp
 import hypothesis.strategies as st
 
-from zolltools.db.sasconvert import Converter  # type: ignore
+from zolltools.sasconvert import Converter  # type: ignore
 
 
 @hp.given(parquet_file_name=st.text())

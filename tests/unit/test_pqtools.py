@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa  # type: ignore
 import pyarrow.parquet as pq  # type: ignore
-from zolltools.db import pqtools  # type: ignore
+from zolltools import pqtools  # type: ignore
 
 
 @contextlib.contextmanager

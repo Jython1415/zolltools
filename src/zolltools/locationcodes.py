@@ -7,9 +7,8 @@ import pickle
 import logging
 import argparse
 from pathlib import Path
-from importlib import resources
-
-import zolltools
+from importlib import resources as impresources
+from . import resources
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -35,8 +34,7 @@ def get_mapping() -> dict:
     start_time = time.perf_counter_ns()
     if _MAPPING is not None:
         return _MAPPING
-    root = resources.files(zolltools)
-    mapping_file = root.joinpath("nemsis", "data", "location-code-mapping.pkl")
+    mapping_file = impresources.files(resources) / "location-code-mapping.pkl"
     logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
     with mapping_file.open("rb") as file:
         mapping = pickle.load(file)
