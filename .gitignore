@@ -1,10 +1,12 @@
-**/.*
-**/.*/**
-/dist/**
-**/__pycache__/**
-**/tmp/**
+.*
+/dist
+**/__pycache__
+**/tmp
 !.gitignore
 !.gitattributes
 
 # Track pre-commit config
 !.pre-commit-config.yaml
+
+# Track .github files
+!/.github
