@@ -175,7 +175,7 @@ class Reader(ParquetManager):
     """
 
     @staticmethod
-    def _pq_generator(pq_iter) -> pd.DataFrame:
+    def _pq_generator(pq_iter) -> Generator[pd.DataFrame, None, None]:
         """
         Generator that wrap an iterator for reading a parquet file in chunks.
         The generator returns pandas.DataFrame objects instead of parquet
