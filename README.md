@@ -30,3 +30,13 @@ Log messages from functions in the `zolltools` package will include a prefix in 
 ```text
 <class name if in class>.<function name>: <message>
 ```
+
+## Development
+
+### Testing
+
+To run tests, use the following command after activating the virtual environment:
+
+```bash
+python -m pytest
+```
