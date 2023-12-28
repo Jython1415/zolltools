@@ -1,0 +1,5 @@
+- [ ] Closes [issue]
+- [ ] Describe change(s) made
+- [ ] Tests added and passed
+- [ ] Documentation updated
+- [ ] Code review
