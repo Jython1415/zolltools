@@ -33,7 +33,9 @@ def _get_loggers(logger_names: Union[Iterable[str], str, None]) -> list[logging.
         and isinstance(logger_names, Iterable)
         and not set(logger_names).issubset(LOGGERS)
     )
-    if logger_names_is_invalid_str or logger_names_contains_invalid_str:
+    if logger_names is not None and (
+        logger_names_is_invalid_str or logger_names_contains_invalid_str
+    ):
         if isinstance(logger_names, str):
             logger_names = [logger_names]
         invalid_logger_names: set[str] = set(logger_names).difference(LOGGERS)
