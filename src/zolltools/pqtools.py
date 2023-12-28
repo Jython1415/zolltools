@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import Optional, Generator, Any
 
 import pandas as pd
-import pyarrow.parquet as pq  # mypy: ignore
+import pyarrow.parquet as pq  # type: ignore
 
-module_logger = logging.getLogger(__name__)
-module_logger.addHandler(logging.NullHandler())
+_MODULE_LOGGER = logging.getLogger(__name__)
+_MODULE_LOGGER.addHandler(logging.NullHandler())
 
 
 class ParquetManager:

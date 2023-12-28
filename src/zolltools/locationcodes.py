@@ -10,8 +10,8 @@ from pathlib import Path
 from importlib import resources as impresources
 from . import resources
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+_MODULE_LOGGER = logging.getLogger(__name__)
+_MODULE_LOGGER.addHandler(logging.NullHandler())
 
 STORAGE_FOLDER_NAME = "location-code-categorizations"
 STORAGE_FOLDER_EXTENSION = ".json"
@@ -35,12 +35,14 @@ def get_mapping() -> dict:
     if _MAPPING is not None:
         return _MAPPING
     mapping_file = impresources.files(resources) / "location-code-mapping.pkl"
-    logger.debug("%s: identified mapping file: %s", log_prefix, repr(mapping_file))
+    _MODULE_LOGGER.debug(
+        "%s: identified mapping file: %s", log_prefix, repr(mapping_file)
+    )
     with mapping_file.open("rb") as file:
         mapping = pickle.load(file)
         _MAPPING = mapping
         end_time = time.perf_counter_ns()
-        logger.info(
+        _MODULE_LOGGER.info(
             "%s: mapping read from %s in %d ns",
             log_prefix,
             mapping_file,
@@ -66,7 +68,7 @@ def to_description(code, default=None, mapping=None) -> str:
     log_prefix = "to_description"
 
     if mapping is None:
-        logger.debug("%s: mapping accessed with get_mapping", log_prefix)
+        _MODULE_LOGGER.debug("%s: mapping accessed with get_mapping", log_prefix)
         mapping = get_mapping()
 
     if code == "7701001":
@@ -78,7 +80,7 @@ def to_description(code, default=None, mapping=None) -> str:
         description = mapping[code]
     except KeyError as error:
         if default is None:
-            logger.error(
+            _MODULE_LOGGER.error(
                 "%s: code (%s) not found in mapping %s", log_prefix, code, repr(mapping)
             )
             raise KeyError(
@@ -111,10 +113,12 @@ def get_categorization(name: str) -> dict:
 
     storage_dir = _get_storage_dir()
     categorization_path = storage_dir.joinpath(f"{name}{STORAGE_FOLDER_EXTENSION}")
-    logger.debug("%s: file path identified as %s", log_prefix, categorization_path)
+    _MODULE_LOGGER.debug(
+        "%s: file path identified as %s", log_prefix, categorization_path
+    )
 
     if not categorization_path.exists():
-        logger.error(
+        _MODULE_LOGGER.error(
             "%s: categorization file (%s) could not be found",
             log_prefix,
             categorization_path,
@@ -125,12 +129,14 @@ def get_categorization(name: str) -> dict:
 
     try:
         with open(categorization_path, "rb") as categorization_file:
-            logger.debug("%s: categorization file successfully opened", log_prefix)
+            _MODULE_LOGGER.debug(
+                "%s: categorization file successfully opened", log_prefix
+            )
             categorization = json.load(categorization_file)
-            logger.debug("%s: categorization read from file", log_prefix)
+            _MODULE_LOGGER.debug("%s: categorization read from file", log_prefix)
             return categorization
     except OSError as error:
-        logger.error(
+        _MODULE_LOGGER.error(
             "%s: categorization file (%s) could not be accessed",
             log_prefix,
             categorization_path,
@@ -144,7 +150,7 @@ def _list() -> None:
     storage_dir = _get_storage_dir()
     paths = storage_dir.glob(f"*{STORAGE_FOLDER_EXTENSION}")
     names = sorted([path.name.removesuffix(STORAGE_FOLDER_EXTENSION) for path in paths])
-    logger.debug(
+    _MODULE_LOGGER.debug(
         "_list: %d categorizations identified in %s: %s",
         len(names),
         storage_dir,

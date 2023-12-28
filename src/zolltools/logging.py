@@ -10,8 +10,8 @@ LOGGERS: list[str] = [
     "zolltools.logging",
 ]
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+_MODULE_LOGGER = logging.getLogger(__name__)
+_MODULE_LOGGER.addHandler(logging.NullHandler())
 
 
 def _get_loggers(logger_names: Union[Iterable[str], str, None]) -> list[logging.Logger]:

@@ -12,8 +12,8 @@ from pathlib import Path
 import pyreadstat  # type: ignore
 import pyarrow.parquet as pq  # type: ignore
 
-module_logger = logging.getLogger(__name__)
-module_logger.addHandler(logging.NullHandler())
+_MODULE_LOGGER = logging.getLogger(__name__)
+_MODULE_LOGGER.addHandler(logging.NullHandler())
 
 
 class Converter:
