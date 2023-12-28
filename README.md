@@ -56,3 +56,11 @@ To run tests, use the following command after activating the virtual environment
 ```bash
 python -m pytest
 ```
+
+### Building
+
+To build and upload the project to test PyPI, use the following command:
+
+```bash
+bash scripts/new-build.sh
+```
