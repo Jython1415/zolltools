@@ -33,6 +33,20 @@ Log messages from functions in the `zolltools` package will include a prefix in 
 
 ## Development
 
+### Installation
+
+To install the package for development, clone the repository and create the virtual environment.
+
+```bash
+git clone https://github.com/Jython1415/zolltools.git # Clone the repo
+cd zolltools
+python3 -m venv .venv # Create the virtual environment
+source .venv/bin/activate # Activate the virtual environment
+pip install --upgrade pip # Update pip if necessary
+pip install -r requirements.txt # Install requirements
+pip install -e . # Install package in editable mode for testing
+```
+
 ### Testing
 
 To run tests, use the following command after activating the virtual environment:
