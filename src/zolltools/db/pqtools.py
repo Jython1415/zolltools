@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import Optional, Generator, Any
 
 import pandas as pd
-import pyarrow.parquet as pq
+import pyarrow.parquet as pq  # mypy: ignore
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+module_logger = logging.getLogger(__name__)
+module_logger.addHandler(logging.NullHandler())
 
 
 class ParquetManager:
@@ -43,7 +43,9 @@ class ParquetManager:
             self.dir_path = dir_path
             self.default_target_in_memory_size = default_target_in_memory_size
             self.enforce_directory = enforce_directory
-            logger.debug(
+            self.logger = logging.getLogger(__name__)
+            self.logger.addHandler(logging.NullHandler())
+            self.logger.debug(
                 "ParquetManagerConfig.__init__: new configuration created %s",
                 repr(self),
             )
@@ -74,6 +76,8 @@ class ParquetManager:
         """
 
         self.config = config
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.NullHandler())
 
     def _enforce_directory(self, file: Path) -> None:
         if self.config.enforce_directory and file.parent != self.config.dir_path:
@@ -134,7 +138,7 @@ class ParquetManager:
         assert target_in_memory_size is not None
         size = self._calc_row_size(file)
         num_rows = math.floor(target_in_memory_size / size)
-        logger.debug(
+        self.logger.debug(
             "%s: calculated chunk size to be %d rows",
             log_prefix,
             num_rows,
@@ -161,7 +165,7 @@ class ParquetManager:
         """
 
         dir_path = self.config.dir_path
-        logger.debug("ParquetManager.get_tables: reading from %s", dir_path)
+        self.logger.debug("ParquetManager.get_tables: reading from %s", dir_path)
         return list(dir_path.glob("*.parquet"))
 
 
@@ -233,7 +237,7 @@ class Reader(ParquetManager):
         chunk_size = self._calc_chunk_size(file)
         pq_file = pq.ParquetFile(file)
         pq_iter = pq_file.iter_batches(batch_size=chunk_size, columns=columns)
-        logger.info(
+        self.logger.info(
             "Reader.get_reader: Returning reader for %s with chunk size %d",
             file,
             chunk_size,
@@ -312,7 +316,7 @@ class Writer(ParquetManager):
 
         self._enforce_directory(file)
         frame.to_parquet(file, engine="fastparquet", index=False)
-        logger.info("Writer.save: saved %s", file)
+        self.logger.info("Writer.save: saved %s", file)
 
     def remove(self, file: Path) -> bool:
         """
@@ -327,7 +331,7 @@ class Writer(ParquetManager):
         self._enforce_directory(file)
         if file.exists():
             os.remove(file)
-            logger.info("%s: removed %s", log_prefix, file)
+            self.logger.info("%s: removed %s", log_prefix, file)
             return True
-        logger.info("%s: %s could not be found", log_prefix, file)
+        self.logger.info("%s: %s could not be found", log_prefix, file)
         return False

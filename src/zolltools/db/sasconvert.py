@@ -12,8 +12,8 @@ from pathlib import Path
 import pyreadstat
 import pyarrow.parquet as pq
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
+module_logger = logging.getLogger(__name__)
+module_logger.addHandler(logging.NullHandler())
 
 
 class Converter:
@@ -22,7 +22,9 @@ class Converter:
     def __init__(self, db_path: Path = Path.cwd(), target_in_memory_size=1e8) -> None:
         self.db_path = db_path
         self.target_in_memory_size = target_in_memory_size
-        logger.debug("Converter: initialized to %s", self.db_path)
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.NullHandler())
+        self.logger.debug("Converter: initialized to %s", self.db_path)
 
     @staticmethod
     def _get_sas_path(parquet_path: Path) -> Path:
@@ -77,7 +79,7 @@ class Converter:
         log_prefix = "Converter._convert_sas"
 
         chunk_size = self._get_chunk_size(sas_path)
-        logger.debug(
+        self.logger.debug(
             "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
         )
 
@@ -86,7 +88,7 @@ class Converter:
         )
         parquet_path = Converter._get_parquet_path(sas_path)
         if parquet_path.exists():
-            logger.error(
+            self.logger.error(
                 "%s: aborted because %s already exists", log_prefix, parquet_path
             )
             raise FileExistsError(f"{parquet_path} already exists")
@@ -99,7 +101,7 @@ class Converter:
                     parquet_path, engine="fastparquet", index=False, append=True
                 )
             end_time = time.perf_counter()
-            logger.debug(
+            self.logger.debug(
                 "%s.iteration: %d, %d", log_prefix, index, end_time - start_time
             )
             start_time = time.perf_counter()
@@ -136,7 +138,7 @@ class Converter:
         # Divide by two because two chunks will be read simultaneously
         chunk_size = math.floor(self._get_chunk_size(sas_path) / 2)
 
-        logger.debug(
+        self.logger.debug(
             "%s: chunk size for %s set to %d", log_prefix, sas_path, chunk_size
         )
         sas_iter = pyreadstat.read_file_in_chunks(
@@ -150,7 +152,7 @@ class Converter:
         for index, chunk in combined_chunk_iterable:
             results.add(self._validate_chunk(chunk))
             end_time = time.perf_counter()
-            logger.debug(
+            self.logger.debug(
                 "%s.iteration: %d, %d", log_prefix, index, end_time - start_time
             )
             start_time = time.perf_counter()
@@ -171,7 +173,9 @@ class Converter:
 
         parquet_path = self._convert_sas(sas_path)
         if not self._validate_parquet_file(parquet_path):
-            logger.error("%s: %s failed due to failed validation", log_prefix, sas_path)
+            self.logger.error(
+                "%s: %s failed due to failed validation", log_prefix, sas_path
+            )
             return False
 
         if delete:
@@ -179,7 +183,7 @@ class Converter:
             with open(sas_path, "w", encoding="utf-8"):
                 pass
             os.remove(sas_path)
-            logger.info("%s: file %s deleted", log_prefix, sas_path)
+            self.logger.info("%s: file %s deleted", log_prefix, sas_path)
 
         return True
 
