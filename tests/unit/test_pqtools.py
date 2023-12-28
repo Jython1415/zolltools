@@ -12,9 +12,9 @@ from typing import Optional, Generator
 import pytest
 import numpy as np
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
-from zolltools.db import pqtools
+import pyarrow as pa  # type: ignore
+import pyarrow.parquet as pq  # type: ignore
+from zolltools.db import pqtools  # type: ignore
 
 
 @contextlib.contextmanager

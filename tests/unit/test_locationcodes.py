@@ -5,8 +5,9 @@ import random
 import importlib
 
 import pytest
-from scipy import stats
-from zolltools.nemsis import locationcodes
+from scipy import stats  # type: ignore
+
+from zolltools.nemsis import locationcodes  # type: ignore
 
 
 @pytest.mark.slow

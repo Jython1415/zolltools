@@ -5,7 +5,8 @@ import logging
 import pytest
 import hypothesis as hp
 import hypothesis.strategies as st
-from zolltools import logging as zoll_logging
+
+from zolltools import logging as zoll_logging  # type: ignore
 
 
 def test_add_handler_all() -> None:
