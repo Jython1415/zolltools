@@ -1,5 +1,7 @@
 # zolltools
 
+ADDED 2025-02-06. THIS PACKAGE USED TO BE USED AS PART OF NEMSIS DATA ANALYSIS FOR THE REIMER TRANSPORT LAB AT CWRU. NOW THAT IT IS OUT OF USE, THE REPOSITORY HAS BEEN ARCHIVED.
+
 The `zolltools` package is a collection of tools and scripts for work with NEMSIS data for the purpose of analyzing and reporting on EMS data. The package has "zoll" in it because it was originally developed as part of a research project funded by a grant from the ZOLL Foundation.
 
 ## Logging
